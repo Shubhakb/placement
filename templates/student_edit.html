@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Student - {{ student.full_name or 'Profile' }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+        header {
+            background: #0f172a;
+            color: white;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        header h1 { margin: 0; font-size: 20px; font-weight: 700; }
+        .nav-links a {
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            margin-left: 20px;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover { color: white; }
+
+        .container {
+            max-width: 1000px;
+            margin: 32px auto;
+            padding: 0 24px;
+        }
+
+        /* Profile Preview Hero Header */
+        .profile-hero {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            color: white;
+            padding: 28px 32px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.2);
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .hero-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .avatar-circle {
+            width: 68px;
+            height: 68px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: 700;
+            color: white;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+            border: 3px solid rgba(255, 255, 255, 0.2);
+        }
+        .hero-info h2 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 700;
+        }
+        .hero-sub {
+            margin: 6px 0 0;
+            color: #cbd5e1;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .hero-badge {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 13px;
+            font-weight: 600;
+            backdrop-filter: blur(4px);
+        }
+
+        /* Interactive Tabs */
+        .tabs-nav {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            background: #e2e8f0;
+            padding: 6px;
+            border-radius: 12px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            background: transparent;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            color: #64748b;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .tab-btn:hover { color: #1e293b; background: rgba(255, 255, 255, 0.5); }
+        .tab-btn.active {
+            background: white;
+            color: #2563eb;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        /* Form Card */
+        .form-card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        .full-width { grid-column: span 2; }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        input, select, textarea {
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s;
+            background: #f8fafc;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: #2563eb;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+        textarea { resize: vertical; min-height: 90px; }
+
+        /* Skill Chips Generator */
+        .skills-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .chip {
+            background: #eff6ff;
+            color: #2563eb;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 13px;
+            font-weight: 600;
+            border: 1px solid #bfdbfe;
+        }
+
+        /* Action Buttons */
+        .form-actions {
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn-cancel {
+            color: #64748b;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            padding: 12px 24px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+        .btn-cancel:hover { background: #e2e8f0; }
+
+        .btn-save {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-save:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .full-width { grid-column: span 1; }
+            .tabs-nav { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>🎓 Placement Management - Admin</h1>
+    <div class="nav-links">
+        <a href="/student/list">← Back to Student List</a>
+        <a href="/admin/dashboard">Dashboard</a>
+    </div>
+</header>
+
+<div class="container">
+
+    <!-- Interactive Hero Preview -->
+    <div class="profile-hero">
+        <div class="hero-left">
+            <div class="avatar-circle" id="previewAvatar">{{ student.full_name[0]|upper if student.full_name else 'S' }}</div>
+            <div class="hero-info">
+                <h2 id="previewName">{{ student.full_name or 'Student Name' }}</h2>
+                <div class="hero-sub">
+                    <span id="previewUSN">USN: {{ student.usn or 'N/A' }}</span>
+                    <span>•</span>
+                    <span class="hero-badge" id="previewDept">{{ student.department or 'Department' }}</span>
+                </div>
+            </div>
+        </div>
+        <div>
+            <span class="hero-badge" style="background: #059669; color: white;" id="previewCGPA">⭐ {{ student.cgpa or '0.0' }} CGPA</span>
+        </div>
+    </div>
+
+    <!-- Interactive Tabs Header -->
+    <div class="tabs-nav">
+        <button type="button" class="tab-btn active" onclick="switchTab('tab-personal', this)">
+            👤 Personal Information
+        </button>
+        <button type="button" class="tab-btn" onclick="switchTab('tab-academic', this)">
+            🎓 Academic Details
+        </button>
+        <button type="button" class="tab-btn" onclick="switchTab('tab-skills', this)">
+            🛠️ Skills & Experience
+        </button>
+        <button type="button" class="tab-btn" onclick="switchTab('tab-resume', this)">
+            📄 Resume & Links
+        </button>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" class="form-card">
+
+        <!-- TAB 1: PERSONAL INFO -->
+        <div id="tab-personal" class="tab-content active">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Full Name *</label>
+                    <input type="text" name="full_name" id="inputName" value="{{ student.full_name or '' }}" required oninput="updateLivePreview()">
+                </div>
+
+                <div class="form-group">
+                    <label>Email Address *</label>
+                    <input type="email" name="email" value="{{ student.email or '' }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="text" name="phone" value="{{ student.phone or '' }}" placeholder="+91 9876543210">
+                </div>
+
+                <div class="form-group">
+                    <label>Date of Birth</label>
+                    <input type="date" name="date_of_birth" value="{{ student.date_of_birth or '' }}">
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Gender</label>
+                    <select name="gender">
+                        <option value="">Select Gender</option>
+                        <option value="Male" {% if student.gender == 'Male' or student.gender == 'male' %}selected{% endif %}>Male</option>
+                        <option value="Female" {% if student.gender == 'Female' or student.gender == 'female' %}selected{% endif %}>Female</option>
+                        <option value="Other" {% if student.gender == 'Other' or student.gender == 'other' %}selected{% endif %}>Other</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: ACADEMIC DETAILS -->
+        <div id="tab-academic" class="tab-content">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>USN / University Roll Number</label>
+                    <input type="text" name="usn" id="inputUSN" value="{{ student.usn or '' }}" placeholder="1MS21CS001" oninput="updateLivePreview()">
+                </div>
+
+                <div class="form-group">
+                    <label>Department / Major</label>
+                    <input type="text" name="department" id="inputDept" value="{{ student.department or '' }}" placeholder="Computer Science & Engineering" oninput="updateLivePreview()">
+                </div>
+
+                <div class="form-group">
+                    <label>Academic Year</label>
+                    <select name="year">
+                        <option value="">Select Academic Year</option>
+                        <option value="1" {% if student.year|string == '1' %}selected{% endif %}>1st Year</option>
+                        <option value="2" {% if student.year|string == '2' %}selected{% endif %}>2nd Year</option>
+                        <option value="3" {% if student.year|string == '3' %}selected{% endif %}>3rd Year</option>
+                        <option value="4" {% if student.year|string == '4' %}selected{% endif %}>4th Year (Final Year)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>CGPA (Cumulative GPA)</label>
+                    <input type="number" step="0.01" min="0" max="10" name="cgpa" id="inputCGPA" value="{{ student.cgpa or '' }}" placeholder="8.5" oninput="updateLivePreview()">
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Active Backlogs</label>
+                    <input type="number" min="0" name="backlogs" value="{{ student.backlogs or 0 }}">
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: SKILLS & EXPERIENCE -->
+        <div id="tab-skills" class="tab-content">
+            <div class="form-grid">
+                <div class="form-group full-width">
+                    <label>Technical Skills (Comma Separated)</label>
+                    <input type="text" name="skills" id="inputSkills" value="{{ student.skills or '' }}" placeholder="Python, Flask, React, SQL, Data Structures" oninput="renderSkillChips()">
+                    <div class="skills-preview" id="chipsContainer"></div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Certifications & Achievements</label>
+                    <textarea name="certifications" placeholder="AWS Certified Developer, Google Cloud Associate, Hackathon Winner">{{ student.certifications or '' }}</textarea>
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Key Projects</label>
+                    <textarea name="projects" placeholder="Placement Management Portal, AI Resume Parser, E-commerce Store">{{ student.projects or '' }}</textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: RESUME & LINKS -->
+        <div id="tab-resume" class="tab-content">
+            <div class="form-grid">
+                <div class="form-group full-width">
+                    <label>Upload New Resume (PDF / DOCX)</label>
+                    <input type="file" name="resume_file" accept=".pdf,.doc,.docx">
+                    {% if student.resume_url %}
+                    {% set res_file = student.resume_url.split('/')[-1] %}
+                    <div style="margin-top: 10px; padding: 12px 16px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; display: flex; align-items: center; justify-content: space-between;">
+                        <span style="color: #166534; font-weight: 700; font-size: 14px;">📄 Current Candidate Resume: {{ res_file }}</span>
+                        <div style="display: flex; gap: 10px;">
+                            <a href="/preview-resume/{{ res_file }}" target="_blank" style="background: #166534; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: 700; font-size: 12px;">👁️ Preview Document</a>
+                            <a href="/download-resume/{{ res_file }}" style="background: #2563eb; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: 700; font-size: 12px;">⬇️ Download File</a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Resume URL Link</label>
+                    <input type="text" name="resume_url" value="{{ student.resume_url or '' }}" placeholder="/uploads/resumes/my_resume.pdf">
+                </div>
+
+                <div class="form-group">
+                    <label>GitHub Profile URL</label>
+                    <input type="url" name="github_url" value="{{ student.github_url or '' }}" placeholder="https://github.com/username">
+                </div>
+
+                <div class="form-group">
+                    <label>Portfolio / LinkedIn URL</label>
+                    <input type="url" name="portfolio_url" value="{{ student.portfolio_url or '' }}" placeholder="https://linkedin.com/in/username">
+                </div>
+
+                <div class="form-group">
+                    <label>Preferred Location</label>
+                    <input type="text" name="preferred_location" value="{{ student.preferred_location or '' }}" placeholder="Bangalore, Hybrid">
+                </div>
+
+                <div class="form-group">
+                    <label>Preferred Work Mode</label>
+                    <select name="preferred_work_mode">
+                        <option value="On-site" {% if student.preferred_work_mode == 'On-site' %}selected{% endif %}>On-site</option>
+                        <option value="Remote" {% if student.preferred_work_mode == 'Remote' %}selected{% endif %}>Remote</option>
+                        <option value="Hybrid" {% if student.preferred_work_mode == 'Hybrid' %}selected{% endif %}>Hybrid</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Submit & Navigation Footer -->
+        <div class="form-actions">
+            <a href="/student/list" class="btn-cancel">Cancel</a>
+            <button type="submit" class="btn-save">
+                💾 Save & Update Profile
+            </button>
+        </div>
+
+    </form>
+</div>
+
+<script>
+function switchTab(tabId, btn) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+
+    document.getElementById(tabId).classList.add('active');
+    btn.classList.add('active');
+}
+
+function updateLivePreview() {
+    const name = document.getElementById('inputName').value.trim() || 'Student Name';
+    const usn = document.getElementById('inputUSN').value.trim() || 'N/A';
+    const dept = document.getElementById('inputDept').value.trim() || 'Department';
+    const cgpa = document.getElementById('inputCGPA').value.trim() || '0.0';
+
+    document.getElementById('previewName').innerText = name;
+    document.getElementById('previewAvatar').innerText = name.charAt(0).toUpperCase();
+    document.getElementById('previewUSN').innerText = 'USN: ' + usn;
+    document.getElementById('previewDept').innerText = dept;
+    document.getElementById('previewCGPA').innerText = '⭐ ' + cgpa + ' CGPA';
+}
+
+function renderSkillChips() {
+    const skillsVal = document.getElementById('inputSkills').value;
+    const container = document.getElementById('chipsContainer');
+    container.innerHTML = '';
+
+    if (skillsVal) {
+        skillsVal.split(',').forEach(skill => {
+            const trimmed = skill.trim();
+            if (trimmed) {
+                const chip = document.createElement('span');
+                chip.className = 'chip';
+                chip.innerText = trimmed;
+                container.appendChild(chip);
+            }
+        });
+    }
+}
+
+// Initial chip render
+document.addEventListener('DOMContentLoaded', renderSkillChips);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Interviews - Interactive Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; margin: 0; background: #f8fafc; color: #1e293b; }
+        header { background: #0f172a; color: white; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        header h1 { margin: 0; font-size: 20px; font-weight: 700; }
+        .nav-links a { color: #94a3b8; text-decoration: none; font-size: 14px; font-weight: 500; margin-left: 20px; }
+        .nav-links a:hover { color: white; }
+        .container { max-width: 1280px; margin: 32px auto; padding: 0 24px; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
+        .page-title { margin: 0; font-size: 24px; font-weight: 800; color: #0f172a; }
+        .btn-primary { background: #2563eb; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; box-shadow: 0 2px 6px rgba(37, 99, 235, 0.2); }
+        .btn-primary:hover { background: #1d4ed8; }
+
+        .toast-notify {
+            position: fixed; top: 24px; right: 24px; background: #0f172a; color: white;
+            padding: 14px 24px; border-radius: 12px; font-weight: 600; font-size: 14px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2); transform: translateY(-100px); opacity: 0; transition: all 0.3s ease; z-index: 9999;
+        }
+        .toast-notify.show { transform: translateY(0); opacity: 1; }
+
+        .filter-pills { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .pill-btn {
+            background: white; border: 1px solid #cbd5e1; color: #475569; padding: 8px 16px;
+            border-radius: 9999px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+        }
+        .pill-btn:hover { background: #f1f5f9; color: #0f172a; }
+        .pill-btn.active { background: #2563eb; color: white; border-color: #2563eb; }
+
+        .toolbar { display: flex; gap: 16px; margin-bottom: 24px; align-items: center; }
+        .search-box { position: relative; flex: 1; max-width: 400px; }
+        .search-box input { width: 100%; padding: 10px 16px 10px 40px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 14px; outline: none; }
+        .search-box input:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
+        .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
+        .stat-badge { background: white; padding: 8px 16px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 13px; font-weight: 600; color: #475569; }
+
+        .table-card { background: white; border-radius: 12px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04); border: 1px solid #e2e8f0; overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { background: #f8fafc; padding: 14px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: #64748b; border-bottom: 1px solid #e2e8f0; }
+        td { padding: 16px 20px; font-size: 14px; color: #334155; border-bottom: 1px solid #f1f5f9; }
+        tr:hover td { background: #f8fafc; }
+
+        .status-select {
+            padding: 6px 12px; border-radius: 9999px; font-size: 12px; font-weight: 700;
+            border: 1px solid transparent; outline: none; cursor: pointer; transition: all 0.2s;
+        }
+        .res-pending { background: #fef3c7; color: #b45309; border-color: #fde68a; }
+        .res-selected { background: #dcfce7; color: #15803d; border-color: #bbf7d0; }
+        .res-rejected { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
+
+        .action-btns { display: flex; gap: 8px; align-items: center; }
+        .btn-action { padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 600; }
+        .btn-edit { background: #eff6ff; color: #2563eb; }
+        .btn-edit:hover { background: #dbeafe; }
+        .btn-delete { background: #fef2f2; color: #dc2626; }
+        .btn-delete:hover { background: #fee2e2; }
+        .btn-timer { background: #fff7ed; color: #c2410c; border: 1px solid #ffedd5; }
+        .btn-timer:hover { background: #ffedd5; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>📅 Interview Schedules - Interactive Manager</h1>
+    <div class="nav-links">
+        <a href="/admin/dashboard">← Dashboard</a>
+        <a href="/student/list">Students</a>
+        <a href="/company/list">Companies</a>
+        <a href="/job/list">Jobs</a>
+        <a href="/application/list">Applications</a>
+        <a href="/placement/list">Placements</a>
+    </div>
+</header>
+
+<div id="toast" class="toast-notify">
+    <span id="toastMsg">Interview result updated!</span>
+</div>
+
+<div class="container">
+    <div class="page-header">
+        <div>
+            <h2 class="page-title">Interviews & Technical Rounds</h2>
+            <p style="margin: 4px 0 0; color: #64748b; font-size: 14px;">Instant result evaluation, live mode filter, and interview timers</p>
+        </div>
+        <a href="/interview/register" class="btn-primary">+ Schedule New Interview</a>
+    </div>
+
+    <div class="filter-pills">
+        <button type="button" class="pill-btn active" onclick="filterByResult('all', this)">All Schedules</button>
+        <button type="button" class="pill-btn" onclick="filterByResult('pending', this)">Pending / Scheduled</button>
+        <button type="button" class="pill-btn" onclick="filterByResult('selected', this)">Selected</button>
+        <button type="button" class="pill-btn" onclick="filterByResult('rejected', this)">Rejected</button>
+    </div>
+
+    <div class="toolbar">
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="Search by student, job, company, interviewer..." onkeyup="filterTable()">
+        </div>
+        <div class="stat-badge">Showing: <strong id="interviewCount">{{ interviews|length }}</strong> / {{ interviews|length }} Interviews</div>
+    </div>
+
+    <div class="table-card">
+        <table id="interviewTable">
+            <thead>
+                <tr>
+                    <th>Student Name</th>
+                    <th>Job & Company</th>
+                    <th>Date & Time</th>
+                    <th>Mode</th>
+                    <th>Interviewer</th>
+                    <th>Live Evaluation Result</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in interviews %}
+                {% set res = (item.result or 'Pending')|lower %}
+                <tr data-result="{{ res }}">
+                    <td>
+                        <strong>{{ item.applications.students.full_name if item.applications and item.applications.students else 'N/A' }}</strong>
+                        <div style="font-size: 12px; color: #64748b;">USN: {{ item.applications.students.usn if item.applications and item.applications.students else 'N/A' }}</div>
+                    </td>
+                    <td>
+                        <div><strong>{{ item.applications.job_postings.job_title if item.applications and item.applications.job_postings else 'N/A' }}</strong></div>
+                        <small style="color: #64748b;">{{ item.applications.job_postings.companies.company_name if item.applications and item.applications.job_postings and item.applications.job_postings.companies else '' }}</small>
+                    </td>
+                    <td>📅 {{ item.interview_date or 'TBD' }}</td>
+                    <td><span style="background: #f1f5f9; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 600;">{{ item.interview_type or 'Online' }}</span></td>
+                    <td>👤 {{ item.interviewer or 'Hiring Manager' }}</td>
+                    <td>
+                        <select class="status-select {% if res == 'selected' %}res-selected{% elif res == 'rejected' %}res-rejected{% else %}res-pending{% endif %}"
+                                onchange="updateInterviewResult('{{ item.id }}', this)">
+                            <option value="Pending" {% if item.result == 'Pending' %}selected{% endif %}>Pending</option>
+                            <option value="Selected" {% if item.result == 'Selected' %}selected{% endif %}>Selected / Qualified</option>
+                            <option value="Rejected" {% if item.result == 'Rejected' %}selected{% endif %}>Rejected</option>
+                        </select>
+                    </td>
+                    <td>
+                        <div class="action-btns">
+                            <a href="/interview/detail/{{ item.id }}" class="btn-action btn-timer">⏰ Countdown</a>
+                            <a href="/interview/edit/{{ item.id }}" class="btn-action btn-edit">✏️ Edit</a>
+                            <a href="/interview/delete/{{ item.id }}" class="btn-action btn-delete" onclick="return confirm('Are you sure you want to delete this interview schedule?')">🗑️ Delete</a>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" style="padding: 40px; text-align: center; color: #64748b;">No interviews scheduled. Click "+ Schedule New Interview" to add one.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+let currentResultFilter = 'all';
+
+function filterByResult(res, btn) {
+    currentResultFilter = res.toLowerCase();
+    document.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    filterTable();
+}
+
+function filterTable() {
+    const searchVal = document.getElementById('searchInput').value.toLowerCase();
+    const rows = document.querySelectorAll('#interviewTable tbody tr');
+    let visibleCount = 0;
+
+    rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        const rowRes = row.getAttribute('data-result') || '';
+        const matchesSearch = text.includes(searchVal);
+        const matchesFilter = (currentResultFilter === 'all') || (rowRes === currentResultFilter);
+
+        if (matchesSearch && matchesFilter) {
+            row.style.display = '';
+            visibleCount++;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+    document.getElementById('interviewCount').innerText = visibleCount;
+}
+
+function updateInterviewResult(interviewId, selectEl) {
+    const newResult = selectEl.value;
+    const lowerRes = newResult.toLowerCase();
+
+    selectEl.className = 'status-select ';
+    if (lowerRes === 'selected') selectEl.classList.add('res-selected');
+    else if (lowerRes === 'rejected') selectEl.classList.add('res-rejected');
+    else selectEl.classList.add('res-pending');
+
+    const tr = selectEl.closest('tr');
+    if (tr) tr.setAttribute('data-result', lowerRes);
+
+    fetch('/api/update-interview-result', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ interview_id: interviewId, result: newResult })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            showToast('⚡ Interview evaluation updated to "' + newResult + '"!');
+        } else {
+            showToast('⚠️ Failed to update result.');
+        }
+    })
+    .catch(() => showToast('⚠️ Connection error.'));
+}
+
+function showToast(msg) {
+    const toast = document.getElementById('toast');
+    document.getElementById('toastMsg').innerText = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+}
+</script>
+
+</body>
+</html>

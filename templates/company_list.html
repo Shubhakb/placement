@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Companies - College Placement System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            background: #f8fafc;
+            color: #1e293b;
+        }
+        header {
+            background: #0f172a;
+            color: white;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        header h1 { margin: 0; font-size: 20px; font-weight: 700; }
+        .nav-links a {
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            margin-left: 20px;
+        }
+        .nav-links a:hover { color: white; }
+        .container {
+            max-width: 1280px;
+            margin: 32px auto;
+            padding: 0 24px;
+        }
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .page-title { margin: 0; font-size: 24px; font-weight: 700; color: #0f172a; }
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            box-shadow: 0 2px 6px rgba(37, 99, 235, 0.2);
+        }
+        .btn-primary:hover { background: #1d4ed8; }
+        .flash-messages { margin-bottom: 20px; }
+        .flash-msg {
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            background: #dcfce7;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+            margin-bottom: 8px;
+        }
+        .toolbar {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+            align-items: center;
+        }
+        .search-box {
+            position: relative;
+            flex: 1;
+            max-width: 400px;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 10px 16px 10px 40px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            font-size: 14px;
+            outline: none;
+        }
+        .search-box input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+        }
+        .stat-badge {
+            background: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            font-size: 13px;
+            font-weight: 600;
+            color: #475569;
+        }
+        .table-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th {
+            background: #f8fafc;
+            padding: 14px 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #64748b;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        td {
+            padding: 16px 20px;
+            font-size: 14px;
+            color: #334155;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        tr:hover td { background: #f8fafc; }
+        .badge-loc { background: #f1f5f9; color: #475569; padding: 4px 10px; border-radius: 9999px; font-size: 12px; font-weight: 600; }
+        .action-btns { display: flex; gap: 8px; }
+        .btn-action {
+            padding: 6px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .btn-edit { background: #eff6ff; color: #2563eb; }
+        .btn-edit:hover { background: #dbeafe; }
+        .btn-delete { background: #fef2f2; color: #dc2626; }
+        .btn-delete:hover { background: #fee2e2; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>🏢 Company Management - Admin</h1>
+    <div class="nav-links">
+        <a href="/admin/dashboard">← Dashboard</a>
+        <a href="/student/list">Students</a>
+        <a href="/job/list">Jobs</a>
+        <a href="/application/list">Applications</a>
+        <a href="/interview/list">Interviews</a>
+        <a href="/placement/list">Placements</a>
+    </div>
+</header>
+
+<div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="flash-msg">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <div class="page-header">
+        <div>
+            <h2 class="page-title">Registered Companies</h2>
+            <p style="margin: 4px 0 0; color: #64748b; font-size: 14px;">Manage corporate partners, hiring contacts, and location details</p>
+        </div>
+        <a href="/company/register" class="btn-primary">+ Register New Company</a>
+    </div>
+
+    <div class="toolbar">
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="Search by company name, location, email..." onkeyup="filterTable()">
+        </div>
+        <div class="stat-badge">Total Companies: <strong id="companyCount">{{ companies|length }}</strong></div>
+    </div>
+
+    <div class="table-card">
+        <table id="companyTable">
+            <thead>
+                <tr>
+                    <th>Company Name</th>
+                    <th>Email / Phone</th>
+                    <th>Location</th>
+                    <th>Website</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for company in companies %}
+                <tr>
+                    <td><strong>{{ company.company_name }}</strong></td>
+                    <td>
+                        <div>{{ company.email }}</div>
+                        <small style="color: #64748b;">{{ company.phone or '' }}</small>
+                    </td>
+                    <td><span class="badge-loc">📍 {{ company.location or 'N/A' }}</span></td>
+                    <td>
+                        {% if company.website %}
+                            <a href="{{ company.website }}" target="_blank" style="color: #2563eb; font-weight: 500;">🌐 {{ company.website }}</a>
+                        {% else %}
+                            <span style="color: #94a3b8;">N/A</span>
+                        {% endif %}
+                    </td>
+                    <td style="max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        {{ company.description or 'No description available' }}
+                    </td>
+                    <td>
+                        <div class="action-btns">
+                            <a href="/company/edit/{{ company.id }}" class="btn-action btn-edit">✏️ Edit</a>
+                            <a href="/company/delete/{{ company.id }}" class="btn-action btn-delete" onclick="return confirm('Are you sure you want to delete {{ company.company_name }}?')">🗑️ Delete</a>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" style="padding: 40px; text-align: center; color: #64748b;">No company records found. Click "+ Register New Company" to add one.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+function filterTable() {
+    const input = document.getElementById('searchInput').value.toLowerCase();
+    const rows = document.querySelectorAll('#companyTable tbody tr');
+    let visibleCount = 0;
+
+    rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        if (text.includes(input)) {
+            row.style.display = '';
+            visibleCount++;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+    document.getElementById('companyCount').innerText = visibleCount;
+}
+</script>
+
+</body>
+</html>

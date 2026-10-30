@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Placement & Interview Calendar</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; margin: 0; background: #f8fafc; color: #1e293b; }
+        header { background: #0f172a; color: white; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; }
+        header h1 { margin: 0; font-size: 20px; font-weight: 700; }
+        .nav-links a { color: #94a3b8; text-decoration: none; font-size: 14px; margin-left: 20px; }
+        .nav-links a:hover { color: white; }
+
+        .container { max-width: 1200px; margin: 32px auto; padding: 0 24px; }
+        .page-header { margin-bottom: 24px; }
+        .page-title { margin: 0; font-size: 26px; font-weight: 800; color: #0f172a; }
+
+        .card {
+            background: white; border-radius: 16px; padding: 28px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04); border: 1px solid #e2e8f0; margin-bottom: 28px;
+        }
+
+        .legend {
+            display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; padding: 14px 20px;
+            background: #f1f5f9; border-radius: 10px; font-size: 13px; font-weight: 600;
+        }
+        .leg-item { display: flex; align-items: center; gap: 8px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+
+        /* FullCalendar Customizations */
+        .fc-theme-standard .fc-scrollgrid { border-radius: 12px; overflow: hidden; border-color: #e2e8f0; }
+        .fc-header-toolbar { flex-wrap: wrap; gap: 12px; }
+        .fc-button-primary { background: #2563eb !important; border-color: #2563eb !important; border-radius: 8px !important; }
+
+        /* Event Modal */
+        .modal-backdrop {
+            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px);
+            display: none; align-items: center; justify-content: center; z-index: 9999;
+        }
+        .modal-backdrop.show { display: flex; }
+        .modal-box {
+            background: white; width: 90%; max-width: 500px; padding: 28px; border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2); animation: popIn 0.2s ease;
+        }
+        @keyframes popIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .modal-close { background: none; border: none; font-size: 20px; cursor: pointer; color: #64748b; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>📅 Interview & Placement Event Calendar</h1>
+    <div class="nav-links">
+        {% if session.get('student_id') %}
+            <a href="/student/dashboard">Student Dashboard</a>
+        {% elif session.get('admin_id') %}
+            <a href="/admin/dashboard">Dashboard</a>
+        {% endif %}
+        <a href="/jobs">Jobs</a>
+    </div>
+</header>
+
+<div class="container">
+    <div class="page-header">
+        <h2 class="page-title">Placement Activities Calendar</h2>
+        <p style="margin: 4px 0 0; color: #64748b; font-size: 14px;">Track upcoming aptitude tests, technical rounds, HR interviews, application deadlines, and placement events</p>
+    </div>
+
+    <!-- Event Legend -->
+    <div class="legend">
+        <div class="leg-item"><div class="dot" style="background: #2563eb;"></div> Technical Interviews</div>
+        <div class="leg-item"><div class="dot" style="background: #9333ea;"></div> HR Interviews</div>
+        <div class="leg-item"><div class="dot" style="background: #d97706;"></div> Aptitude Tests</div>
+        <div class="leg-item"><div class="dot" style="background: #dc2626;"></div> Application Deadlines</div>
+        <div class="leg-item"><div class="dot" style="background: #059669;"></div> Placement Offers</div>
+    </div>
+
+    <!-- Calendar Container Card -->
+    <div class="card">
+        <div id="calendar"></div>
+    </div>
+</div>
+
+<!-- Modal Pop-up -->
+<div id="eventModal" class="modal-backdrop">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3 id="modalTitle" style="margin: 0; font-size: 18px; color: #0f172a;">Event Details</h3>
+            <button class="modal-close" onclick="closeModal()">✕</button>
+        </div>
+        <div id="modalBody" style="font-size: 14px; color: #475569; line-height: 1.6;">
+            <!-- Dynamic Event Info -->
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const calendarEl = document.getElementById('calendar');
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,listWeek'
+        },
+        events: '/api/calendar-events',
+        eventClick: function(info) {
+            document.getElementById('modalTitle').innerText = info.event.title;
+            document.getElementById('modalBody').innerHTML = `
+                <p><strong>Date:</strong> ${info.event.start ? info.event.start.toLocaleDateString() : 'N/A'}</p>
+                <p><strong>Category:</strong> ${info.event.extendedProps.type || 'Placement Event'}</p>
+                <p><strong>Details:</strong> ${info.event.extendedProps.description || 'No additional details.'}</p>
+            `;
+            document.getElementById('eventModal').classList.add('show');
+        }
+    });
+    calendar.render();
+});
+
+function closeModal() {
+    document.getElementById('eventModal').classList.remove('show');
+}
+</script>
+
+</body>
+</html>

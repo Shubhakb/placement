@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Active Placement Drives - Campus Recruitment Portal</title>
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #eff6ff;
+            --accent-purple: #8b5cf6;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --bg-dark: #0f172a;
+            --bg-slate: #1e293b;
+            --bg-body: #f8fafc;
+            --card-bg: #ffffff;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border-light: #e2e8f0;
+            --shadow-subtle: 0 4px 20px rgba(0, 0, 0, 0.04);
+            --shadow-card: 0 10px 30px rgba(15, 23, 42, 0.06);
+            --shadow-hover: 0 20px 40px rgba(37, 99, 235, 0.12);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body { 
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; 
+            background-color: var(--bg-body); 
+            color: var(--text-dark); 
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* -------------------------------------------------------------
+           TOP NAVIGATION BAR
+        ------------------------------------------------------------- */
+        header { 
+            background: linear-gradient(135deg, #0b1120 0%, #0f172a 50%, #1e293b 100%); 
+            color: #ffffff; 
+            padding: 16px 48px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000; 
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.25); 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+        }
+        .logo { 
+            font-size: 21px; 
+            font-weight: 800; 
+            color: #ffffff; 
+            text-decoration: none; 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            letter-spacing: -0.4px; 
+            transition: transform 0.2s;
+        }
+        .logo:hover { transform: scale(1.02); }
+        .logo-shape {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, #38bdf8 0%, #2563eb 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
+            transform: rotate(-3deg);
+            transition: all 0.3s ease;
+        }
+        .logo:hover .logo-shape {
+            transform: rotate(0deg) scale(1.08);
+            box-shadow: 0 6px 20px rgba(56, 189, 248, 0.6);
+        }
+        .logo span {
+            background: linear-gradient(135deg, #ffffff 0%, #93c5fd 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links { 
+            display: flex; 
+            gap: 12px; 
+            align-items: center; 
+            list-style: none; 
+            margin: 0; 
+            padding: 0; 
+        }
+        .nav-links li { display: flex; align-items: center; }
+        .nav-links > li > a:not(.btn-portal) { 
+            color: #cbd5e1; 
+            text-decoration: none; 
+            font-size: 14px; 
+            font-weight: 600; 
+            padding: 8px 14px; 
+            border-radius: 8px; 
+            transition: all 0.2s ease; 
+        }
+        .nav-links > li > a:not(.btn-portal):hover,
+        .nav-links > li > a.active { 
+            color: #38bdf8; 
+            background: rgba(255, 255, 255, 0.08); 
+        }
+
+        .btn-portal { 
+            height: 40px;
+            padding: 0 20px; 
+            border-radius: 10px; 
+            text-decoration: none; 
+            font-size: 13px; 
+            font-weight: 700; 
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 8px; 
+            white-space: nowrap;
+            box-sizing: border-box;
+            border: 1px solid transparent;
+        }
+        .btn-portal:hover { transform: translateY(-2px); }
+
+        .btn-student { 
+            background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%); 
+            color: white !important; 
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.35);
+        }
+        .btn-student:hover { 
+            background: linear-gradient(135deg, #1d4ed8 0%, #4338ca 100%);
+            box-shadow: 0 8px 24px rgba(37, 99, 235, 0.5);
+        }
+
+        .btn-logout { 
+            background: rgba(239, 68, 68, 0.12);
+            color: #fca5a5 !important;
+            border: 1px solid rgba(239, 68, 68, 0.35);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.15);
+        }
+        .btn-logout:hover { 
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: #ffffff !important;
+            border-color: #ef4444;
+            box-shadow: 0 8px 24px rgba(239, 68, 68, 0.45);
+        }
+
+        .btn-saved-counter {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #f8fafc !important;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+        .btn-saved-counter:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #38bdf8;
+            color: #38bdf8 !important;
+        }
+
+        /* -------------------------------------------------------------
+           HERO SECTION WITH ANIMATED GEOMETRIC SHAPES
+        ------------------------------------------------------------- */
+        .page-hero {
+            position: relative;
+            background: linear-gradient(135deg, #090e1a 0%, #0f172a 45%, #1e1b4b 100%);
+            color: #ffffff;
+            padding: 60px 24px 80px 24px;
+            text-align: center;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .hero-shape {
+            position: absolute;
+            pointer-events: none;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.35;
+            z-index: 1;
+            animation: floatShape 8s ease-in-out infinite alternate;
+        }
+        .shape-1 {
+            width: 380px; height: 380px;
+            background: radial-gradient(circle, #38bdf8 0%, #2563eb 100%);
+            top: -60px; left: -60px;
+        }
+        .shape-2 {
+            width: 420px; height: 420px;
+            background: radial-gradient(circle, #8b5cf6 0%, #6366f1 100%);
+            bottom: -80px; right: -60px;
+            animation-duration: 11s;
+            animation-direction: alternate-reverse;
+        }
+        .shape-3 {
+            width: 250px; height: 250px;
+            background: radial-gradient(circle, #10b981 0%, #059669 100%);
+            top: 20%; right: 25%;
+            animation-duration: 9s;
+        }
+        @keyframes floatShape {
+            0% { transform: translateY(0px) scale(1); }
+            100% { transform: translateY(-25px) scale(1.08); }
+        }
+
+        .hero-inner {
+            position: relative;
+            z-index: 2;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .top-back-row {
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 20px;
+        }
+        .top-back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #cbd5e1;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            backdrop-filter: blur(8px);
+            transition: all 0.2s ease;
+        }
+        .top-back-btn:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.18);
+            border-color: #38bdf8;
+            transform: translateX(-3px);
+        }
+
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(56, 189, 248, 0.15);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            color: #38bdf8;
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 16px;
+            backdrop-filter: blur(8px);
+        }
+
+        .page-hero h1 {
+            font-size: 40px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            line-height: 1.2;
+            margin-bottom: 12px;
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-hero p {
+            font-size: 16px;
+            color: #cbd5e1;
+            max-width: 680px;
+            margin: 0 auto 24px auto;
+            font-weight: 500;
+        }
+
+        /* -------------------------------------------------------------
+           CONTAINER & FILTER PANEL
+        ------------------------------------------------------------- */
+        .container {
+            width: 92%;
+            max-width: 1280px;
+            margin: -40px auto 60px auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        .filter-panel {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 24px 28px;
+            box-shadow: 0 10px 35px rgba(15, 23, 42, 0.08);
+            border: 1px solid #e2e8f0;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .filter-header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .filter-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .filter-title-shape {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: #eff6ff;
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .filter-row {
+            display: grid;
+            grid-template-columns: 2fr 1.3fr 1fr 1fr auto;
+            gap: 16px;
+            align-items: end;
+        }
+        @media (max-width: 992px) {
+            .filter-row { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 600px) {
+            .filter-row { grid-template-columns: 1fr; }
+        }
+
+        .filter-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: #475569;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .input-wrapper i {
+            position: absolute;
+            left: 14px;
+            color: #94a3b8;
+            font-size: 15px;
+            pointer-events: none;
+        }
+        .filter-group input, 
+        .filter-group select {
+            width: 100%;
+            padding: 12px 14px 12px 40px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: inherit;
+            color: #1e293b;
+            background: #f8fafc;
+            transition: all 0.2s ease;
+        }
+        .filter-group select {
+            padding-left: 36px;
+            cursor: pointer;
+        }
+        .filter-group input:focus, 
+        .filter-group select:focus {
+            outline: none;
+            border-color: #2563eb;
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+        }
+
+        .btn-filter-apply {
+            height: 48px;
+            padding: 0 24px;
+            background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .btn-filter-apply:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.45);
+        }
+
+        .btn-filter-reset {
+            height: 48px;
+            padding: 0 16px;
+            background: #f1f5f9;
+            color: #475569;
+            text-decoration: none;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s;
+        }
+        .btn-filter-reset:hover {
+            background: #e2e8f0;
+            color: #0f172a;
+        }
+
+        /* Quick Interactive Preset Chips */
+        .quick-chips-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 16px;
+            padding-top: 14px;
+            border-top: 1px solid #f1f5f9;
+            flex-wrap: wrap;
+        }
+        .chip-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-right: 4px;
+        }
+        .quick-filter-chip {
+            padding: 6px 14px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .quick-filter-chip:hover {
+            background: #eff6ff;
+            color: #2563eb;
+            border-color: #93c5fd;
+            transform: translateY(-1px);
+        }
+
+        /* -------------------------------------------------------------
+           RESULTS SUMMARY STRIP
+        ------------------------------------------------------------- */
+        .results-summary-strip {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .results-count {
+            font-size: 15px;
+            font-weight: 700;
+            color: #334155;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .count-badge {
+            background: #2563eb;
+            color: white;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        /* -------------------------------------------------------------
+           JOB CARDS GRID - COLORFUL & INTERACTIVE
+        ------------------------------------------------------------- */
+        .job-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 26px;
+        }
+        @media (max-width: 480px) {
+            .job-grid { grid-template-columns: 1fr; }
+        }
+
+        .drive-card {
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 24px;
+        }
+        .drive-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 6px;
+            height: 100%;
+            transition: width 0.25s ease;
+        }
+        .drive-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 16px 36px rgba(15, 23, 42, 0.09);
+        }
+        .drive-card:hover::before {
+            width: 8px;
+        }
+
+        /* Distinct Color Accents */
+        .card-blue::before { background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%); }
+        .card-blue:hover { border-color: #93c5fd; }
+
+        .card-emerald::before { background: linear-gradient(180deg, #10b981 0%, #059669 100%); }
+        .card-emerald:hover { border-color: #a7f3d0; }
+
+        .card-purple::before { background: linear-gradient(180deg, #8b5cf6 0%, #6366f1 100%); }
+        .card-purple:hover { border-color: #ddd6fe; }
+
+        .card-amber::before { background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%); }
+        .card-amber:hover { border-color: #fde68a; }
+
+        /* Card Top Header */
+        .card-top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .badge-status {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .badge-applied {
+            background: #dbeafe;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+        }
+        .badge-open {
+            background: #dcfce7;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+        }
+        .badge-closed {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+
+        .pulse-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #15803d;
+            display: inline-block;
+            box-shadow: 0 0 0 0 rgba(21, 128, 61, 0.7);
+            animation: pulseGreen 1.8s infinite;
+        }
+        @keyframes pulseGreen {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(21, 128, 61, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(21, 128, 61, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(21, 128, 61, 0); }
+        }
+
+        /* Interactive Bookmark Star Button */
+        .btn-bookmark {
+            padding: 6px 12px;
+            background: #f8fafc;
+            color: #475569;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            border: 1px solid #cbd5e1;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s ease;
+        }
+        .btn-bookmark:hover {
+            color: #b45309;
+            background: #fffbeb;
+            border-color: #fde68a;
+            transform: scale(1.04);
+        }
+        .btn-bookmark.bookmarked {
+            background: #fef3c7;
+            color: #b45309;
+            border-color: #fde68a;
+            font-weight: 800;
+        }
+
+        /* Company Row */
+        .company-header-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 12px;
+        }
+        .company-avatar-shape {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 800;
+            flex-shrink: 0;
+            transition: transform 0.2s;
+        }
+        .drive-card:hover .company-avatar-shape {
+            transform: scale(1.08) rotate(3deg);
+        }
+        .avatar-blue { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+        .avatar-emerald { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+        .avatar-purple { background: #f5f3ff; color: #7c3aed; border: 1px solid #ddd6fe; }
+        .avatar-amber { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
+
+        .job-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: #0f172a;
+            letter-spacing: -0.3px;
+            line-height: 1.3;
+            margin-bottom: 3px;
+        }
+        .company-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: #0284c7;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .job-desc {
+            font-size: 13.5px;
+            color: #475569;
+            line-height: 1.5;
+            margin: 10px 0 16px 0;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            min-height: 40px;
+        }
+
+        /* Meta Chips */
+        .meta-chips-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .meta-chip {
+            padding: 5px 11px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .chip-loc {
+            background: #f1f5f9;
+            color: #475569;
+        }
+        .chip-loc i { color: #ef4444; }
+
+        .chip-salary {
+            background: #dcfce7;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+        }
+
+        .chip-cgpa {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+
+        /* Bottom Action Row */
+        .action-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 16px;
+            margin-top: auto;
+        }
+        .deadline-text {
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748b;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-view-apply {
+            padding: 9px 18px;
+            background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 9px;
+            font-weight: 700;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+            transition: all 0.2s ease;
+        }
+        .btn-view-apply:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(37, 99, 235, 0.38);
+            background: linear-gradient(135deg, #1d4ed8 0%, #4338ca 100%);
+        }
+        .btn-view-apply i {
+            transition: transform 0.2s ease;
+        }
+        .btn-view-apply:hover i {
+            transform: translateX(3px);
+        }
+
+        /* Empty State */
+        .empty-state {
+            grid-column: 1 / -1;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 60px 24px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+        }
+        .empty-icon-shape {
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
+            background: #f1f5f9;
+            color: #94a3b8;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            margin-bottom: 16px;
+        }
+        .empty-state h3 {
+            font-size: 20px;
+            font-weight: 800;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+        .empty-state p {
+            color: #64748b;
+            font-size: 14px;
+            max-width: 460px;
+            margin: 0 auto 20px auto;
+        }
+
+        /* -------------------------------------------------------------
+           FOOTER
+        ------------------------------------------------------------- */
+        footer { 
+            background-color: #0f172a; 
+            color: #94a3b8; 
+            padding: 40px 20px; 
+            text-align: center; 
+            font-size: 14px; 
+            border-top: 1px solid #1e293b; 
+        }
+        footer a { 
+            color: #cbd5e1; 
+            text-decoration: none; 
+            margin: 0 10px; 
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+        footer a:hover { color: #38bdf8; }
+    </style>
+</head>
+<body>
+
+    <!-- Top Navigation Header -->
+    <header>
+        <a href="/" class="logo">
+            <div class="logo-shape">
+                <i class="bi bi-mortarboard-fill"></i>
+            </div>
+            <span>PlacementPortal</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/jobs" class="active">Placement Drives</a></li>
+            <li><a href="/companies">Companies</a></li>
+            <li>
+                <a href="/jobs/saved" class="btn-saved-counter">
+                    <i class="bi bi-bookmark-star-fill" style="color: #fbbf24;"></i> Saved Drives ({% if saved_job_ids %}{{ saved_job_ids|length }}{% else %}0{% endif %})
+                </a>
+            </li>
+            
+            {% if session.get('student_id') %}
+                <li><a href="/student/dashboard" class="btn-portal btn-student"><i class="bi bi-speedometer2"></i> My Dashboard</a></li>
+            {% else %}
+                <li><a href="/student/login" class="btn-portal btn-student"><i class="bi bi-person-fill"></i> Student Login</a></li>
+                <li><a href="/company/login" style="color: #cbd5e1; font-size: 13px; font-weight: 600; text-decoration: none; margin-left: 6px;">Recruiter Portal</a></li>
+            {% endif %}
+
+            {% if session.get('student_id') or session.get('company_id') or session.get('admin_logged_in') %}
+                <li><a href="/logout" class="btn-portal btn-logout" title="Log Out of Portal"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+            {% endif %}
+        </ul>
+    </header>
+
+    <!-- Interactive Hero Banner with Animated Floating Geometric Shapes -->
+    <section class="page-hero">
+        <div class="hero-shape shape-1"></div>
+        <div class="hero-shape shape-2"></div>
+        <div class="hero-shape shape-3"></div>
+
+        <div class="hero-inner">
+            <div class="top-back-row">
+                <a href="/" class="top-back-btn">
+                    <i class="bi bi-arrow-left"></i> Back to Home
+                </a>
+            </div>
+
+            <div class="hero-eyebrow">
+                <i class="bi bi-briefcase-fill"></i> Campus Recruitment Portal
+            </div>
+            <h1>
+                Explore Campus <span class="gradient-text">Placement Drives</span>
+            </h1>
+            <p>
+                Browse verified campus hiring opportunities, check automated eligibility thresholds, and apply directly to corporate partners.
+            </p>
+        </div>
+    </section>
+
+    <div class="container">
+        <!-- Interactive Multi-Parameter Filter Panel -->
+        <div class="filter-panel">
+            <div class="filter-header-bar">
+                <div class="filter-title">
+                    <div class="filter-title-shape">
+                        <i class="bi bi-funnel-fill"></i>
+                    </div>
+                    <span>Filter & Search Placement Drives</span>
+                </div>
+                <a href="/jobs/saved" style="font-size: 13px; font-weight: 700; color: #2563eb; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+                    <i class="bi bi-bookmark-fill"></i> View Bookmarked ({% if saved_job_ids %}{{ saved_job_ids|length }}{% else %}0{% endif %}) &rarr;
+                </a>
+            </div>
+
+            <form method="GET" action="/jobs">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label for="query">Search Keywords</label>
+                        <div class="input-wrapper">
+                            <i class="bi bi-search"></i>
+                            <input type="text" id="query" name="query" value="{{ search_query or '' }}" placeholder="Job title, skills (Python, SQL), company...">
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="location">Location</label>
+                        <div class="input-wrapper">
+                            <i class="bi bi-geo-alt"></i>
+                            <input type="text" id="location" name="location" value="{{ location_filter or '' }}" placeholder="e.g. Bengaluru, Remote">
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="status">Drive Status</label>
+                        <div class="input-wrapper">
+                            <i class="bi bi-toggle2-on"></i>
+                            <select id="status" name="status">
+                                <option value="">All Statuses</option>
+                                <option value="Active" {% if status_filter == 'Active' or status_filter == 'Open' %}selected{% endif %}>Open / Active</option>
+                                <option value="Closed" {% if status_filter == 'Closed' %}selected{% endif %}>Closed</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="max_cgpa">Max CGPA Limit</label>
+                        <div class="input-wrapper">
+                            <i class="bi bi-mortarboard"></i>
+                            <select id="max_cgpa" name="max_cgpa">
+                                <option value="">Any CGPA</option>
+                                <option value="6.0" {% if max_cgpa_filter == '6.0' %}selected{% endif %}>&le; 6.0 CGPA</option>
+                                <option value="7.0" {% if max_cgpa_filter == '7.0' %}selected{% endif %}>&le; 7.0 CGPA</option>
+                                <option value="8.0" {% if max_cgpa_filter == '8.0' %}selected{% endif %}>&le; 8.0 CGPA</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 8px;">
+                        <button type="submit" class="btn-filter-apply">
+                            <i class="bi bi-search"></i> Filter Drives
+                        </button>
+                        {% if search_query or location_filter or status_filter or max_cgpa_filter %}
+                        <a href="/jobs" class="btn-filter-reset" title="Reset all filters">
+                            <i class="bi bi-x-circle"></i> Reset
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Quick Interactive Preset Chips -->
+                <div class="quick-chips-row">
+                    <span class="chip-label"><i class="bi bi-lightning-charge-fill"></i> Quick Filter:</span>
+                    <button type="button" class="quick-filter-chip" onclick="applyPreset('Software Engineer', '')">
+                        <i class="bi bi-code-slash"></i> Software Engineer
+                    </button>
+                    <button type="button" class="quick-filter-chip" onclick="applyPreset('Full Stack', '')">
+                        <i class="bi bi-layers-fill"></i> Full Stack
+                    </button>
+                    <button type="button" class="quick-filter-chip" onclick="applyPreset('', 'Bengaluru')">
+                        <i class="bi bi-geo-alt"></i> Bengaluru
+                    </button>
+                    <button type="button" class="quick-filter-chip" onclick="applyCgpaPreset('7.0')">
+                        <i class="bi bi-patch-check"></i> &le; 7.0 CGPA
+                    </button>
+                    <button type="button" class="quick-filter-chip" onclick="applyStatusPreset('Active')">
+                        <i class="bi bi-check2-circle"></i> Open Only
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Results Counter & Info Strip -->
+        <div class="results-summary-strip">
+            <div class="results-count">
+                <span>Available Placement Drives:</span>
+                <span class="count-badge">{{ jobs|length }} Active</span>
+                {% if search_query %}
+                <span style="font-size: 13px; color: #64748b; font-weight: 500;">matching "{{ search_query }}"</span>
+                {% endif %}
+            </div>
+            <div style="font-size: 13px; color: #64748b;">
+                Showing real-time campus recruitment drives with verified criteria
+            </div>
+        </div>
+
+        <!-- Placement Drives Grid -->
+        <div class="job-grid">
+            {% for job in jobs %}
+            {% set loop_idx = loop.index0 % 4 %}
+            {% set accent_class = ['card-blue', 'card-emerald', 'card-purple', 'card-amber'][loop_idx] %}
+            {% set avatar_class = ['avatar-blue', 'avatar-emerald', 'avatar-purple', 'avatar-amber'][loop_idx] %}
+            {% set is_saved = job.id in saved_job_ids %}
+            {% set is_applied = job.id in applied_job_ids %}
+
+            <div class="drive-card {{ accent_class }}">
+                <div>
+                    <!-- Card Top Header (Status Badge & Bookmark) -->
+                    <div class="card-top-row">
+                        {% if is_applied %}
+                        <span class="badge-status badge-applied">
+                            <i class="bi bi-check-circle-fill"></i> Applied
+                        </span>
+                        {% else %}
+                        <span class="badge-status {% if job.status == 'Closed' %}badge-closed{% else %}badge-open{% endif %}">
+                            <span class="pulse-dot"></span> {{ job.status or 'Open' }}
+                        </span>
+                        {% endif %}
+
+                        {% if is_saved %}
+                        <a href="/job/unsave/{{ job.id }}" class="btn-bookmark bookmarked" title="Remove from bookmarks">
+                            <i class="bi bi-star-fill" style="color: #f59e0b;"></i> Bookmarked
+                        </a>
+                        {% else %}
+                        <a href="/job/save/{{ job.id }}" class="btn-bookmark" title="Bookmark this drive">
+                            <i class="bi bi-star"></i> Bookmark
+                        </a>
+                        {% endif %}
+                    </div>
+
+                    <!-- Company Logo Shape & Job Title -->
+                    <div class="company-header-row">
+                        <div class="company-avatar-shape {{ avatar_class }}">
+                            {{ (job.companies.company_name[0] if job.companies and job.companies.company_name else job.job_title[0]) | upper }}
+                        </div>
+                        <div>
+                            <h2 class="job-title">{{ job.job_title }}</h2>
+                            <div class="company-name">
+                                <i class="bi bi-building"></i> {{ job.companies.company_name if job.companies else 'Corporate Recruiter' }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Job Description Snippet -->
+                    <p class="job-desc">
+                        {{ job.description or 'Comprehensive campus recruitment drive for engineering and software candidates with verified academic criteria.' }}
+                    </p>
+
+                    <!-- Colorful Meta Chips -->
+                    <div class="meta-chips-row">
+                        <span class="meta-chip chip-loc">
+                            <i class="bi bi-geo-alt-fill"></i> {{ job.location or 'Bengaluru' }}
+                        </span>
+                        <span class="meta-chip chip-salary">
+                            <i class="bi bi-currency-rupee"></i> ₹{{ job.salary }} LPA
+                        </span>
+                        <span class="meta-chip chip-cgpa">
+                            <i class="bi bi-award-fill"></i> Min CGPA: {{ job.eligibility_cgpa or 'N/A' }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Action Row at Bottom -->
+                <div class="action-row">
+                    <span class="deadline-text">
+                        <i class="bi bi-clock-history"></i> Deadline: {{ job.last_date or 'Open' }}
+                    </span>
+                    <a href="/job/detail/{{ job.id }}" class="btn-view-apply">
+                        <span>View & Apply</span> <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon-shape">
+                    <i class="bi bi-search"></i>
+                </div>
+                <h3>No Matching Placement Drives Found</h3>
+                <p>We could not find any active drives matching your current filter criteria. Try adjusting your keyword, CGPA limit, or reset the filters.</p>
+                <a href="/jobs" class="btn-filter-apply" style="display: inline-flex;">
+                    <i class="bi bi-arrow-counterclockwise"></i> Reset All Filters
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 College Placement Management System &bull; Placement Center</p>
+        <p style="margin-top: 8px;">
+            <a href="/">Home</a> &bull;
+            <a href="/jobs">Placement Drives</a> &bull;
+            <a href="/companies">Partner Companies</a> &bull;
+            <a href="/jobs/saved">Bookmarked Drives</a>
+        </p>
+    </footer>
+
+    <!-- Interactive Filter Scripts -->
+    <script>
+        function applyPreset(queryVal, locVal) {
+            if (queryVal) document.getElementById('query').value = queryVal;
+            if (locVal) document.getElementById('location').value = locVal;
+            document.querySelector('.filter-panel form').submit();
+        }
+
+        function applyCgpaPreset(val) {
+            document.getElementById('max_cgpa').value = val;
+            document.querySelector('.filter-panel form').submit();
+        }
+
+        function applyStatusPreset(val) {
+            document.getElementById('status').value = val;
+            document.querySelector('.filter-panel form').submit();
+        }
+    </script>
+</body>
+</html>

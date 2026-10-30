@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Job Posting</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        form {
+            max-width: 600px;
+            margin: 20px auto;
+        }
+
+        label {
+            display: block;
+            margin-top: 12px;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            height: 100px;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Add Job Posting</h1>
+
+    <form method="POST">
+
+        <label>Company</label>
+
+        <select name="company_id" required>
+
+            <option value="">-- Select Company --</option>
+
+            {% for company in companies %}
+            <option value="{{ company.id }}">
+                {{ company.company_name }}
+            </option>
+            {% endfor %}
+
+        </select>
+
+        <label>Job Title</label>
+        <input type="text" name="job_title" required>
+
+        <label>Description</label>
+        <textarea name="description"></textarea>
+
+        <label>Location</label>
+        <input type="text" name="location">
+
+        <label>Salary</label>
+        <input type="number" step="0.01" name="salary">
+
+        <label>Eligibility CGPA</label>
+        <input type="number" step="0.01" name="eligibility_cgpa">
+
+        <label>Last Date</label>
+        <input type="date" name="last_date">
+
+        <label>Status</label>
+
+        <select name="status">
+            <option value="Open">Open</option>
+            <option value="Closed">Closed</option>
+        </select>
+
+        <button type="submit">
+            Add Job Posting
+        </button>
+
+    </form>
+
+    <div style="text-align:center;">
+        <a href="/job/list">
+            ← Back to Job Postings
+        </a>
+    </div>
+
+</body>
+</html>

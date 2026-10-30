@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Application Status - Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; margin: 0; background: #f1f5f9; color: #0f172a; }
+        header { background: #0f172a; color: white; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        header h1 { margin: 0; font-size: 20px; font-weight: 700; }
+        .nav-links a { color: #94a3b8; text-decoration: none; font-size: 14px; font-weight: 500; margin-left: 20px; }
+        .nav-links a:hover { color: white; }
+        .container { max-width: 800px; margin: 32px auto; padding: 0 24px; }
+        .form-card {
+            background: white; border-radius: 16px; padding: 32px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;
+        }
+        .form-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        label { font-size: 13px; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; }
+        select {
+            padding: 12px 16px; border-radius: 8px; border: 1px solid #cbd5e1;
+            font-family: inherit; font-size: 14px; outline: none; transition: all 0.2s; background: #f8fafc;
+        }
+        select:focus { border-color: #2563eb; background: white; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
+        .status-preview {
+            padding: 16px 20px; border-radius: 12px; margin-top: 10px; font-weight: 600; font-size: 15px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .st-applied { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+        .st-shortlisted { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+        .st-selected { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+        .st-rejected { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+
+        .form-actions { margin-top: 32px; padding-top: 24px; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+        .btn-cancel { color: #64748b; text-decoration: none; font-weight: 600; font-size: 14px; padding: 12px 24px; border-radius: 8px; }
+        .btn-cancel:hover { background: #e2e8f0; }
+        .btn-save {
+            background: #2563eb; color: white; border: none; padding: 12px 28px;
+            border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); transition: all 0.2s;
+        }
+        .btn-save:hover { background: #1d4ed8; transform: translateY(-1px); }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>📝 Edit Application - Admin</h1>
+    <div class="nav-links">
+        <a href="/application/list">← Back to Applications</a>
+        <a href="/admin/dashboard">Dashboard</a>
+    </div>
+</header>
+
+<div class="container">
+    <form method="POST" class="form-card">
+        <h2 style="margin-top: 0; margin-bottom: 24px; color: #0f172a; font-size: 20px;">Update Candidate Application</h2>
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Select Student *</label>
+                <select name="student_id" required>
+                    {% for st in students %}
+                    <option value="{{ st.id }}" {% if st.id == application.student_id %}selected{% endif %}>
+                        {{ st.full_name }} (USN: {{ st.usn or 'N/A' }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Select Job Position *</label>
+                <select name="job_id" required>
+                    {% for job in jobs %}
+                    <option value="{{ job.id }}" {% if job.id == application.job_id %}selected{% endif %}>
+                        {{ job.job_title }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Application Progress Status *</label>
+                <select name="status" id="statusSelect" onchange="updateStatusPreview()">
+                    <option value="Applied" {% if application.status == 'Applied' %}selected{% endif %}>Applied</option>
+                    <option value="Shortlisted" {% if application.status == 'Shortlisted' %}selected{% endif %}>Shortlisted</option>
+                    <option value="Selected" {% if application.status == 'Selected' %}selected{% endif %}>Selected (Hired)</option>
+                    <option value="Rejected" {% if application.status == 'Rejected' %}selected{% endif %}>Rejected</option>
+                </select>
+
+                <div class="status-preview st-applied" id="statusPreviewCard">
+                    <span>📌 Selected Status:</span> <strong id="statusPreviewText">Applied</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <a href="/application/list" class="btn-cancel">Cancel</a>
+            <button type="submit" class="btn-save">💾 Save Application Status</button>
+        </div>
+    </form>
+</div>
+
+<script>
+function updateStatusPreview() {
+    const val = document.getElementById('statusSelect').value;
+    const card = document.getElementById('statusPreviewCard');
+    const text = document.getElementById('statusPreviewText');
+
+    text.innerText = val;
+    card.className = 'status-preview ';
+
+    if (val === 'Selected') card.classList.add('st-selected');
+    else if (val === 'Shortlisted') card.classList.add('st-shortlisted');
+    else if (val === 'Rejected') card.classList.add('st-rejected');
+    else card.classList.add('st-applied');
+}
+document.addEventListener('DOMContentLoaded', updateStatusPreview);
+</script>
+
+</body>
+</html>

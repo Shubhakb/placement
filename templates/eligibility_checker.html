@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automatic Eligibility Checker - Placement System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; margin: 0; background: #f8fafc; color: #1e293b; }
+        header { background: #0f172a; color: white; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        header h1 { margin: 0; font-size: 20px; font-weight: 700; }
+        .nav-links a { color: #94a3b8; text-decoration: none; font-size: 14px; font-weight: 500; margin-left: 20px; }
+        .nav-links a:hover { color: white; }
+        .container { max-width: 1000px; margin: 32px auto; padding: 0 24px; }
+        
+        .page-header { margin-bottom: 24px; }
+        .page-title { margin: 0; font-size: 26px; font-weight: 800; color: #0f172a; }
+        
+        .card {
+            background: white; border-radius: 16px; padding: 32px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04); border: 1px solid #e2e8f0; margin-bottom: 28px;
+        }
+
+        .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+        .full-width { grid-column: span 2; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        label { font-size: 13px; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; }
+        input, select {
+            padding: 12px 16px; border-radius: 8px; border: 1px solid #cbd5e1;
+            font-family: inherit; font-size: 14px; outline: none; transition: all 0.2s; background: #f8fafc;
+        }
+        input:focus, select:focus { border-color: #2563eb; background: white; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
+
+        .btn-check {
+            background: #2563eb; color: white; border: none; padding: 14px 28px;
+            border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); transition: all 0.2s; width: 100%;
+            margin-top: 20px; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-check:hover { background: #1d4ed8; transform: translateY(-1px); }
+
+        /* Results Card */
+        .result-hero {
+            padding: 24px 32px; border-radius: 16px; margin-bottom: 24px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .hero-eligible { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+        .hero-ineligible { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+        .status-pill {
+            padding: 6px 16px; border-radius: 9999px; font-size: 14px; font-weight: 700; text-transform: uppercase;
+        }
+        .pill-pass { background: #166534; color: white; }
+        .pill-fail { background: #991b1b; color: white; }
+
+        .criteria-list { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
+        .criterion-item {
+            padding: 16px 20px; border-radius: 12px; font-size: 14px; font-weight: 500;
+            display: flex; align-items: flex-start; gap: 14px; border: 1px solid #e2e8f0;
+        }
+        .crit-pass { background: #f0fdf4; border-color: #bbf7d0; color: #166534; }
+        .crit-fail { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+        .icon-box {
+            width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 14px; flex-shrink: 0;
+        }
+        .icon-pass { background: #22c55e; color: white; }
+        .icon-fail { background: #ef4444; color: white; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>⚡ Automatic Eligibility Checker</h1>
+    <div class="nav-links">
+        {% if session.get('student_id') %}
+            <a href="/student/dashboard">Student Dashboard</a>
+            <a href="/jobs">Browse Jobs</a>
+        {% elif session.get('admin_id') %}
+            <a href="/admin/dashboard">Dashboard</a>
+            <a href="/student/list">Students</a>
+            <a href="/job/list">Jobs</a>
+        {% else %}
+            <a href="/jobs">Browse Jobs</a>
+            <a href="/student/login">Student Login</a>
+        {% endif %}
+    </div>
+</header>
+
+<div class="container">
+    <div class="page-header">
+        <h2 class="page-title">Candidate Eligibility Inspector</h2>
+        <p style="margin: 4px 0 0; color: #64748b; font-size: 14px;">Instant evaluation engine matching CGPA, backlogs, department, graduation year, and skills against company criteria</p>
+    </div>
+
+    <!-- Checker Input Card -->
+    <form method="POST" action="/eligibility-checker" class="card">
+        <div class="form-grid">
+            <div class="form-group full-width">
+                <label>1. Select Company Placement Job Drive *</label>
+                <select name="job_id" required onchange="this.form.submit()">
+                    <option value="">-- Choose Job Drive --</option>
+                    {% for job in jobs %}
+                    <option value="{{ job.id }}" {% if selected_job_id|string == job.id|string %}selected{% endif %}>
+                        {{ job.job_title }} - {{ job.companies.company_name if job.companies else 'Company' }} (Min CGPA: {{ job.eligibility_cgpa or '0' }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group full-width" style="border-top: 1px solid #e2e8f0; padding-top: 20px;">
+                <label>2. Select Existing Registered Student (Or Fill Custom Candidate Values Below)</label>
+                <select name="student_id" onchange="this.form.submit()">
+                    <option value="">-- Select Registered Student --</option>
+                    {% for st in students %}
+                    <option value="{{ st.id }}" {% if selected_student_id|string == st.id|string %}selected{% endif %}>
+                        {{ st.full_name }} (USN: {{ st.usn or 'N/A' }}, CGPA: {{ st.cgpa or 'N/A' }}, Dept: {{ st.department or 'N/A' }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            {% if not selected_student_id %}
+            <div class="form-group">
+                <label>Candidate CGPA</label>
+                <input type="number" step="0.01" name="cgpa" value="{{ request.form.get('cgpa', '8.0') }}" placeholder="8.5">
+            </div>
+
+            <div class="form-group">
+                <label>Active Backlogs</label>
+                <input type="number" name="backlogs" value="{{ request.form.get('backlogs', '0') }}" placeholder="0">
+            </div>
+
+            <div class="form-group">
+                <label>Department / Branch</label>
+                <input type="text" name="department" value="{{ request.form.get('department', 'Computer Science') }}" placeholder="CSE / ISE / ECE">
+            </div>
+
+            <div class="form-group">
+                <label>Graduation Year / Batch</label>
+                <input type="text" name="year" value="{{ request.form.get('year', '2026') }}" placeholder="2026">
+            </div>
+
+            <div class="form-group full-width">
+                <label>Candidate Skills (Comma Separated)</label>
+                <input type="text" name="skills" value="{{ request.form.get('skills', 'Python, Flask, SQL, React') }}" placeholder="Python, Java, React, SQL">
+            </div>
+            {% endif %}
+        </div>
+
+        <button type="submit" class="btn-check">
+            🔍 Evaluate Candidate Eligibility
+        </button>
+    </form>
+
+    <!-- Results Display -->
+    {% if result %}
+    <div class="card">
+        <div class="result-hero {% if result.is_eligible %}hero-eligible{% else %}hero-ineligible{% endif %}">
+            <div>
+                <h3 style="margin: 0; font-size: 22px;">
+                    Candidate Evaluation Result
+                </h3>
+                <p style="margin: 4px 0 0; font-size: 14px; opacity: 0.9;">
+                    Evaluated for <strong>{{ selected_student.full_name or 'Candidate' }}</strong> against <strong>{{ selected_job.job_title }}</strong>
+                </p>
+            </div>
+            <span class="status-pill {% if result.is_eligible %}pill-pass{% else %}pill-fail{% endif %}">
+                {% if result.is_eligible %}
+                    ✅ ELIGIBLE
+                {% else %}
+                    ❌ NOT ELIGIBLE
+                {% endif %}
+            </span>
+        </div>
+
+        <h4 style="margin: 0 0 16px; font-size: 16px; color: #0f172a;">Criteria Breakdown (5 Policy Rules):</h4>
+        
+        <div class="criteria-list">
+            {% for reason in result.reasons %}
+            <div class="criterion-item {% if reason.pass %}crit-pass{% else %}crit-fail{% endif %}">
+                <div class="icon-box {% if reason.pass %}icon-pass{% else %}icon-fail{% endif %}">
+                    {% if reason.pass %}✓{% else %}✕{% endif %}
+                </div>
+                <div>
+                    <strong>{{ reason.category or 'Criterion' }}:</strong> {{ reason.message }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+</body>
+</html>

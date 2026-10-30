@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Company Directory - CPMS</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; color: #1e293b; }
+        header { background-color: #0f172a; color: #ffffff; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; color: #38bdf8; text-decoration: none; }
+        .nav-links { display: flex; gap: 20px; align-items: center; list-style: none; }
+        .nav-links a { color: #cbd5e1; text-decoration: none; font-size: 15px; font-weight: 500; }
+        .nav-links a:hover { color: #38bdf8; }
+
+        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+        .page-header { background: white; padding: 25px 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.04); margin-bottom: 25px; }
+        .page-header h1 { color: #0f172a; font-size: 26px; }
+
+        .search-bar { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.04); margin-bottom: 30px; display: flex; gap: 15px; }
+        .search-bar input { padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; flex: 1; }
+        .search-bar button { padding: 10px 20px; background: #2563eb; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
+
+        .company-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; }
+        .company-card { background: white; padding: 25px; border-radius: 10px; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.04); text-align: center; }
+        .avatar { width: 60px; height: 60px; background: #0284c7; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 700; margin: 0 auto 15px auto; }
+        .comp-name { font-size: 20px; font-weight: 700; color: #0f172a; margin-bottom: 5px; }
+        .comp-loc { font-size: 13px; color: #64748b; margin-bottom: 12px; }
+        .comp-desc { font-size: 14px; color: #475569; margin-bottom: 20px; min-height: 42px; }
+        .btn-view-jobs { display: inline-block; padding: 8px 18px; background: #0f172a; color: white; text-decoration: none; border-radius: 6px; font-size: 13px; font-weight: 600; }
+        .btn-view-jobs:hover { background: #1e293b; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="/" class="logo">🎓 College Placement Management System</a>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/jobs">Placement Drives</a></li>
+            <li><a href="/companies">Company Directory</a></li>
+            {% if session.get('student_id') %}
+                <li><a href="/student/dashboard" style="color: #38bdf8; font-weight: 700;"><i class="bi bi-speedometer2"></i> Student Dashboard</a></li>
+            {% else %}
+                <li><a href="/student/login">Student Portal</a></li>
+            {% endif %}
+            {% if session.get('company_id') %}
+                <li><a href="/company/dashboard" style="color: #34d399; font-weight: 700;"><i class="bi bi-building"></i> Recruiter Dashboard</a></li>
+            {% else %}
+                <li><a href="/company/login">Recruiter Portal</a></li>
+            {% endif %}
+            {% if session.get('student_id') or session.get('company_id') or session.get('admin_logged_in') %}
+                <li><a href="/logout" style="color: #f87171; font-weight: 700;"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+            {% endif %}
+        </ul>
+    </header>
+
+    <div class="container">
+        <div class="page-header">
+            <h1>🏛️ Corporate Recruiter Directory</h1>
+            <p style="color: #64748b; margin-top: 5px;">Discover hiring partners participating in upcoming campus placement drives.</p>
+        </div>
+
+        <form method="GET" action="/companies" class="search-bar">
+            <input type="text" name="query" value="{{ search_query or '' }}" placeholder="Search company name, location or industry...">
+            <button type="submit">Search Companies</button>
+            {% if search_query %}
+            <a href="/companies" style="padding: 10px 15px; background: #94a3b8; color: white; text-decoration: none; border-radius: 6px; font-size: 14px;">Clear Search</a>
+            {% endif %}
+        </form>
+
+        <div class="company-grid">
+            {% for company in companies %}
+            <div class="company-card">
+                <div class="avatar">{{ company.company_name[0]|upper if company.company_name else 'C' }}</div>
+                <h2 class="comp-name">{{ company.company_name }}</h2>
+                <div class="comp-loc">📍 {{ company.location or 'Global' }} | 🌐 <a href="{{ company.website or '#' }}" target="_blank" style="color: #0284c7; text-decoration: none;">Website</a></div>
+                <p class="comp-desc">{{ company.description or 'Corporate partner participating in campus recruitment.' }}</p>
+                <a href="/jobs?query={{ company.company_name }}" class="btn-view-jobs">View Openings & Drives</a>
+            </div>
+            {% else %}
+            <p style="color: #64748b; grid-column: 1/-1; text-align: center; padding: 40px; background: white; border-radius: 10px;">
+                No companies found matching your search.
+            </p>
+            {% endfor %}
+        </div>
+    </div>
+
+</body>
+</html>

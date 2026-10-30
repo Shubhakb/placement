@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Schedule Interview</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        form {
+            max-width: 600px;
+            margin: 20px auto;
+        }
+
+        label {
+            display: block;
+            margin-top: 12px;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            height: 100px;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Schedule Interview</h1>
+
+    <form method="POST">
+
+        <label>Application</label>
+
+        <select name="application_id" required>
+
+            <option value="">-- Select Application --</option>
+
+            {% for application in applications %}
+
+            <option value="{{ application.id }}">
+                {{ application.students.full_name }}
+                - {{ application.job_postings.job_title }}
+            </option>
+
+            {% endfor %}
+
+        </select>
+
+        <label>Interview Date</label>
+
+        <input type="datetime-local"
+               name="interview_date"
+               required>
+
+        <label>Interview Type</label>
+
+        <select name="interview_type">
+
+            <option value="Online">Online</option>
+            <option value="Offline">Offline</option>
+
+        </select>
+
+        <label>Interviewer</label>
+
+        <input type="text"
+               name="interviewer">
+
+        <label>Result</label>
+
+        <select name="result">
+
+            <option value="Pending">Pending</option>
+            <option value="Selected">Selected</option>
+            <option value="Rejected">Rejected</option>
+
+        </select>
+
+        <label>Remarks</label>
+
+        <textarea name="remarks"></textarea>
+
+        <button type="submit">
+            Schedule Interview
+        </button>
+
+    </form>
+
+    <div style="text-align:center;">
+        <a href="/interview/list">
+            ← Back to Interviews
+        </a>
+    </div>
+
+</body>
+</html>

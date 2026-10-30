@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - Placement Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --bg-dark: #0f172a;
+            --bg-light: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --success: #059669;
+            --warning: #d97706;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; background: #f8fafc; color: var(--text-main); min-height: 100vh; }
+
+        header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; padding: 18px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 20px rgba(0,0,0,0.12); }
+        .logo { font-size: 20px; font-weight: 800; color: #38bdf8; text-decoration: none; display: flex; align-items: center; gap: 10px; }
+        .nav-items { display: flex; align-items: center; gap: 20px; }
+        .nav-items a { color: #cbd5e1; text-decoration: none; font-size: 14px; font-weight: 600; transition: color 0.2s; }
+        .nav-items a:hover { color: #38bdf8; }
+
+        .notif-badge { position: relative; cursor: pointer; font-size: 18px; color: #cbd5e1; text-decoration: none; }
+        .badge-count { position: absolute; top: -6px; right: -8px; background: #ef4444; color: white; font-size: 10px; font-weight: 800; border-radius: 50%; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; }
+
+        .container {
+            width: 92%;
+            max-width: 1280px;
+            margin: 35px auto;
+        }
+
+        /* Banner Welcome matching Admin Dashboard */
+        .welcome-card {
+            background: white;
+            padding: 28px 32px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            margin-bottom: 35px;
+            border: 1px solid #f1f5f9;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .welcome-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 6px;
+            height: 100%;
+            background: linear-gradient(180deg, #3b82f6 0%, #6366f1 100%);
+        }
+
+        .welcome-card h2 {
+            margin-top: 0;
+            margin-bottom: 8px;
+            color: #0f172a;
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .welcome-card p {
+            margin: 0;
+            color: #64748b;
+            font-size: 15px;
+        }
+
+        .section-title {
+            margin: 0 0 20px 0;
+            color: #0f172a;
+            font-size: 20px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Grid Layout */
+        .dashboard-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 28px; }
+
+        .card { background: white; border-radius: 16px; padding: 26px; border: 1px solid #f1f5f9; box-shadow: 0 4px 20px rgba(0,0,0,0.03); margin-bottom: 28px; }
+        .card-header-styled { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid #f1f5f9; }
+        .card-title-styled { font-size: 18px; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 10px; }
+
+        /* Interactive Filter Pills */
+        .filter-pills { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+        .filter-pill { padding: 6px 14px; background: #f8fafc; color: #475569; border: 1px solid #e2e8f0; border-radius: 20px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+        .filter-pill:hover, .filter-pill.active { background: #2563eb; color: white; border-color: #2563eb; box-shadow: 0 3px 10px rgba(37, 99, 235, 0.25); }
+
+        /* Modern Colorful Interactive Drive Card */
+        .interactive-drive-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 18px 20px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        }
+        .interactive-drive-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            transition: width 0.2s ease;
+        }
+        .interactive-drive-card:hover {
+            transform: translateY(-3px);
+            border-color: #93c5fd;
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.08);
+        }
+        .interactive-drive-card:hover::before {
+            width: 7px;
+        }
+
+        .card-accent-blue::before { background: linear-gradient(180deg, #3b82f6 0%, #6366f1 100%); }
+        .card-accent-emerald::before { background: linear-gradient(180deg, #10b981 0%, #059669 100%); }
+        .card-accent-amber::before { background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%); }
+        .card-accent-purple::before { background: linear-gradient(180deg, #8b5cf6 0%, #7c3aed 100%); }
+
+        .drive-main-info { display: flex; align-items: center; gap: 16px; flex: 1; }
+        .company-avatar { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800; flex-shrink: 0; }
+        .avatar-blue { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+        .avatar-emerald { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+        .avatar-amber { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
+        .avatar-purple { background: #f5f3ff; color: #7c3aed; border: 1px solid #ddd6fe; }
+
+        .drive-details { flex: 1; }
+        .drive-title-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
+        .drive-job-title { font-size: 16px; font-weight: 800; color: #0f172a; letter-spacing: -0.3px; }
+        .package-badge { background: #dcfce7; color: #15803d; font-weight: 800; font-size: 11px; padding: 3px 9px; border-radius: 12px; border: 1px solid #bbf7d0; display: inline-flex; align-items: center; gap: 4px; }
+
+        .drive-meta-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; font-size: 13px; color: #64748b; margin-bottom: 7px; }
+        .drive-meta-row span { display: inline-flex; align-items: center; gap: 5px; }
+
+        .drive-tags-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        .tag-pill { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 6px; background: #f1f5f9; color: #475569; display: inline-flex; align-items: center; gap: 4px; }
+        .tag-eligible { background: #dcfce7; color: #166534; font-weight: 700; }
+        .tag-cgpa { background: #fef3c7; color: #92400e; font-weight: 600; }
+
+        .drive-actions { display: flex; align-items: center; gap: 10px; margin-left: 20px; }
+        .btn-apply-gradient { padding: 9px 18px; background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%); color: white !important; border-radius: 8px; font-size: 13px; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25); transition: all 0.2s ease; white-space: nowrap; }
+        .btn-apply-gradient:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35); background: linear-gradient(135deg, #1d4ed8 0%, #4338ca 100%); }
+        .btn-save-job { width: 36px; height: 36px; border-radius: 8px; border: 1px solid #cbd5e1; background: white; color: #64748b; display: flex; align-items: center; justify-content: center; text-decoration: none; transition: all 0.2s; }
+        .btn-save-job:hover { color: #e11d48; border-color: #fda4af; background: #fff1f2; }
+        .btn-save-job.saved { color: #e11d48; background: #fff1f2; border-color: #fda4af; }
+
+        /* Profile completion bar */
+        .completion-container { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; margin-bottom: 20px; }
+        .bar-bg { background: #e2e8f0; height: 10px; border-radius: 10px; overflow: hidden; margin-top: 8px; }
+        .bar-fill { background: linear-gradient(90deg, #2563eb, #059669); height: 100%; transition: width 0.5s ease; }
+
+        /* Badges */
+        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; }
+        .status-applied { background: #e0f2fe; color: #0369a1; }
+        .status-shortlisted { background: #dcfce7; color: #15803d; }
+        .status-interview { background: #fef3c7; color: #b45309; }
+        .status-selected { background: #d1fae5; color: #047857; }
+        .status-rejected { background: #fee2e2; color: #b91c1c; }
+
+        /* Interview Item & Countdown */
+        .interview-box { background: #fffbeb; border: 1px solid #fde68a; border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+        .countdown-timer { font-size: 13px; font-weight: 700; color: #b45309; display: flex; align-items: center; gap: 6px; margin-top: 8px; }
+    </style>
+</head>
+<body>
+
+    <!-- Official Security Warning Pop-up Modal -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div id="officialNoticeModal" class="official-modal-overlay">
+          <div class="official-modal-box">
+            <div class="official-modal-header">
+              <div class="official-modal-icon">🛡️</div>
+              <div>
+                <h3>Official Security & Privacy Notice</h3>
+                <p>College Placement Administration System</p>
+              </div>
+            </div>
+            <div class="official-modal-body">
+              {% for category, message in messages %}
+                <div class="official-alert-msg alert-{{ category }}">
+                  {{ message }}
+                </div>
+              {% endfor %}
+            </div>
+            <div class="official-modal-footer">
+              <button type="button" onclick="closeOfficialModal()" class="btn-official-close">Acknowledge & Close</button>
+            </div>
+          </div>
+        </div>
+
+        <style>
+          .official-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(6px);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 99999; animation: modalPopIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+          }
+          .official-modal-box {
+            background: #ffffff; width: 90%; max-width: 520px; border-radius: 16px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35); overflow: hidden; border-top: 6px solid #dc2626;
+          }
+          .official-modal-header {
+            background: #fef2f2; padding: 20px 24px; display: flex; align-items: center; gap: 16px;
+            border-bottom: 1px solid #fee2e2;
+          }
+          .official-modal-icon {
+            width: 48px; height: 48px; background: #fee2e2; color: #dc2626; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0;
+          }
+          .official-modal-header h3 { margin: 0; font-size: 17px; font-weight: 800; color: #991b1b; }
+          .official-modal-header p { margin: 2px 0 0 0; font-size: 12px; color: #b91c1c; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+          .official-modal-body { padding: 24px; font-size: 14px; color: #334155; line-height: 1.6; }
+          .official-alert-msg { background: #f8fafc; border-left: 4px solid #ef4444; padding: 14px 16px; border-radius: 8px; font-weight: 600; color: #1e293b; }
+          .official-alert-msg.alert-warning { border-left-color: #f59e0b; background: #fffbeb; color: #92400e; }
+          .official-modal-footer { padding: 16px 24px; background: #f8fafc; border-top: 1px solid #e2e8f0; text-align: right; }
+          .btn-official-close { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; border: none; padding: 10px 22px; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.2s; }
+          .btn-official-close:hover { background: #334155; transform: translateY(-1px); }
+          @keyframes modalPopIn { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }
+        </style>
+
+        <script>
+          function closeOfficialModal() {
+            const modal = document.getElementById('officialNoticeModal');
+            if (modal) modal.style.display = 'none';
+          }
+        </script>
+      {% endif %}
+    {% endwith %}
+
+    <header>
+        <div>
+            <h1 style="font-size: 20px; font-weight: 800; color: white; display: flex; align-items: center; gap: 10px; margin: 0;">
+                <i class="bi bi-mortarboard-fill" style="color: #38bdf8;"></i> College Placement Management System
+            </h1>
+            <p style="font-size: 13px; color: #94a3b8; margin: 3px 0 0 0;">Student Portal & Placement Center</p>
+        </div>
+        <div class="nav-items">
+            <a href="/jobs"><i class="bi bi-briefcase"></i> Placement Drives</a>
+            <a href="/calendar"><i class="bi bi-calendar3"></i> Calendar</a>
+            <a href="/skill-gap-analysis"><i class="bi bi-bullseye"></i> Skill Gap</a>
+            <a href="/eligibility-checker"><i class="bi bi-cpu"></i> Eligibility</a>
+            <a href="/student/profile"><i class="bi bi-person"></i> My Profile</a>
+            <a href="/notification/list" class="notif-badge" title="Notifications">
+                <i class="bi bi-bell-fill"></i>
+                {% set unread = notifications | selectattr('is_read', 'equalto', false) | list | length %}
+                {% if unread > 0 %}<span class="badge-count">{{ unread }}</span>{% endif %}
+            </a>
+            <a href="/student/logout" style="color: #cbd5e1; text-decoration: none; font-size: 13px; font-weight: 600; padding: 8px 16px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px;" onmouseover="this.style.borderColor='#f87171'; this.style.color='#f87171'" onmouseout="this.style.borderColor='rgba(255,255,255,0.2)'; this.style.color='#cbd5e1'">
+                <i class="bi bi-box-arrow-right"></i> Logout
+            </a>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Welcome Banner matching Admin Dashboard -->
+        <div class="welcome-card">
+            <div>
+                <h2>Welcome back, {{ student.full_name or 'Student' }}! 👋</h2>
+                <p>
+                    {{ student.department or 'Engineering & Placement Candidate' }} &bull; USN: {{ student.usn or 'Active Student' }} &bull; CGPA: {{ student.cgpa or 'N/A' }}
+                </p>
+                <div style="margin-top: 10px; font-size: 13px; color: #64748b; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <span style="display: inline-flex; align-items: center; gap: 5px; background: #f1f5f9; padding: 4px 10px; border-radius: 6px; font-weight: 600; color: #334155;">
+                        <i class="bi bi-tools" style="color: #2563eb;"></i> Skills: {{ student.skills or 'Python, Flask, JavaScript, SQL, Web Dev' }}
+                    </span>
+                    <span style="display: inline-flex; align-items: center; gap: 5px; background: #ecfdf5; padding: 4px 10px; border-radius: 6px; font-weight: 700; color: #059669;">
+                        <i class="bi bi-check-circle-fill"></i> Profile {{ completion_pct }}% Completed
+                    </span>
+                </div>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                <a href="/student/profile" class="btn-quick" style="background: #f8fafc; color: #1e293b !important; border: 1px solid #cbd5e1; box-shadow: none;">
+                    <i class="bi bi-person-gear"></i> Edit Profile
+                </a>
+                <a href="/jobs" class="btn-quick">
+                    <i class="bi bi-briefcase-fill"></i> Placement Drives &rarr;
+                </a>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- Left Column: Recommended Drives & Active Applications -->
+            <div>
+
+                <!-- Recommended Placement Drives -->
+                <div class="card">
+                    <div class="card-header-styled">
+                        <div>
+                            <div class="card-title-styled">
+                                <i class="bi bi-stars" style="color: #f59e0b; font-size: 22px;"></i> Recommended Placement Drives
+                            </div>
+                            <p style="font-size: 13px; color: #64748b; margin-top: 3px;">Campus recruitment drives matched to your branch & academic profile</p>
+                        </div>
+                        <a href="/jobs" style="font-size: 13px; color: var(--primary); font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+                            View All Drives <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+
+                    <!-- Interactive Quick Filter Pills -->
+                    <div class="filter-pills">
+                        <button type="button" class="filter-pill active" onclick="filterDrives('all', this)">
+                            <i class="bi bi-grid-fill"></i> All Drives ({{ jobs|length }})
+                        </button>
+                        <button type="button" class="filter-pill" onclick="filterDrives('eligible', this)">
+                            <i class="bi bi-patch-check-fill"></i> Eligible for Me
+                        </button>
+                        <button type="button" class="filter-pill" onclick="filterDrives('high-package', this)">
+                            <i class="bi bi-lightning-charge-fill"></i> ₹7+ LPA Packages
+                        </button>
+                    </div>
+
+                    <div id="recommendedDrivesList">
+                    {% for job in jobs %}
+                    {% set loop_idx = loop.index0 % 4 %}
+                    {% set accent_class = ['card-accent-blue', 'card-accent-emerald', 'card-accent-amber', 'card-accent-purple'][loop_idx] %}
+                    {% set avatar_class = ['avatar-blue', 'avatar-emerald', 'avatar-amber', 'avatar-purple'][loop_idx] %}
+                    {% set is_eligible = student.cgpa and job.eligibility_cgpa and (student.cgpa|float >= job.eligibility_cgpa|float) %}
+                    {% set is_saved = job.id in saved_job_ids %}
+                    
+                    <div class="interactive-drive-card {{ accent_class }}" 
+                         data-eligible="{{ 'true' if is_eligible else 'false' }}"
+                         data-salary="{{ job.salary or 0 }}">
+                        
+                        <div class="drive-main-info">
+                            <!-- Company Logo Avatar -->
+                            <div class="company-avatar {{ avatar_class }}">
+                                {{ (job.companies.company_name[0] if job.companies and job.companies.company_name else job.job_title[0]) | upper }}
+                            </div>
+
+                            <div class="drive-details">
+                                <div class="drive-title-row">
+                                    <span class="drive-job-title">{{ job.job_title }}</span>
+                                    {% if job.salary %}
+                                    <span class="package-badge"><i class="bi bi-currency-rupee"></i> {{ job.salary }} LPA</span>
+                                    {% endif %}
+                                </div>
+
+                                <div class="drive-meta-row">
+                                    <span><i class="bi bi-building"></i> <strong>{{ job.companies.company_name if job.companies else 'Corporate Recruiter' }}</strong></span>
+                                    <span><i class="bi bi-geo-alt"></i> {{ job.location or 'Bengaluru' }}</span>
+                                    <span><i class="bi bi-briefcase"></i> {{ job.work_mode or 'Onsite' }}</span>
+                                </div>
+
+                                <div class="drive-tags-row">
+                                    <span class="tag-pill tag-cgpa"><i class="bi bi-mortarboard"></i> Min CGPA: {{ job.eligibility_cgpa or 'N/A' }}</span>
+                                    {% if is_eligible %}
+                                    <span class="tag-pill tag-eligible"><i class="bi bi-check-circle-fill"></i> Eligible to Apply</span>
+                                    {% else %}
+                                    <span class="tag-pill" style="background: #f1f5f9; color: #64748b;"><i class="bi bi-info-circle"></i> CGPA Criteria</span>
+                                    {% endif %}
+                                    {% if job.last_date %}
+                                    <span class="tag-pill"><i class="bi bi-clock-history"></i> Deadline: {{ job.last_date }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="drive-actions">
+                            <a href="{% if is_saved %}/job/unsave/{{ job.id }}{% else %}/job/save/{{ job.id }}{% endif %}" 
+                               class="btn-save-job {% if is_saved %}saved{% endif %}" 
+                               title="{% if is_saved %}Remove bookmark{% else %}Bookmark Job{% endif %}">
+                                <i class="bi {% if is_saved %}bi-bookmark-fill{% else %}bi-bookmark{% endif %}"></i>
+                            </a>
+                            <a href="/job/detail/{{ job.id }}" class="btn-apply-gradient">
+                                <span>View & Apply</span> <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                    {% else %}
+                    <p style="font-size: 14px; color: var(--text-muted); text-align: center; padding: 25px;">
+                        No placement drives currently available. Check back soon!
+                    </p>
+                    {% endfor %}
+                    </div>
+                </div>
+
+                <!-- My Active Applications -->
+                <div class="card" id="myApplicationsSection">
+                    <div class="card-header-styled">
+                        <div>
+                            <div class="card-title-styled">
+                                <i class="bi bi-file-earmark-check-fill" style="color: #2563eb; font-size: 22px;"></i> My Active Applications
+                            </div>
+                            <p style="font-size: 13px; color: #64748b; margin-top: 3px;">Track your ongoing recruitment rounds and interview stages</p>
+                        </div>
+                        <span style="font-size: 12px; font-weight: 700; background: #eff6ff; color: #2563eb; padding: 4px 12px; border-radius: 20px; border: 1px solid #bfdbfe;">
+                            {{ applications | length }} Applied
+                        </span>
+                    </div>
+
+                    {% if applications %}
+                        {% for app in applications %}
+                        {% set st = (app.status or 'Applied') | lower %}
+                        <div class="interactive-drive-card card-accent-blue" style="margin-bottom: 12px; padding: 15px 18px;">
+                            <div class="drive-main-info">
+                                <div class="company-avatar avatar-blue" style="width: 42px; height: 42px; font-size: 18px;">
+                                    {{ (app.job_postings.companies.company_name[0] if app.job_postings and app.job_postings.companies else 'J') | upper }}
+                                </div>
+                                <div class="drive-details">
+                                    <div class="drive-title-row">
+                                        <span class="drive-job-title" style="font-size: 15px;">{{ app.job_postings.job_title if app.job_postings else 'Position' }}</span>
+                                    </div>
+                                    <div class="drive-meta-row" style="margin-bottom: 0;">
+                                        <span><i class="bi bi-building"></i> <strong>{{ app.job_postings.companies.company_name if app.job_postings and app.job_postings.companies else 'Corporate Recruiter' }}</strong></span>
+                                        <span><i class="bi bi-calendar3"></i> Applied: {{ app.applied_at[:10] if app.applied_at else 'Recent' }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px; margin-left: 15px;">
+                                <span class="status-badge status-{{ st }}">{{ app.status or 'Applied' }}</span>
+                                <a href="/application/timeline/{{ app.id }}" class="btn-quick" style="padding: 7px 14px; font-size: 12px; background: #f1f5f9; color: #334155; box-shadow: none; border: 1px solid #cbd5e1;">
+                                    <span>Timeline</span> <i class="bi bi-chevron-right" style="font-size: 10px;"></i>
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div style="text-align: center; padding: 25px 20px; background: #f8fafc; border-radius: 12px; border: 1px dashed #cbd5e1;">
+                            <i class="bi bi-inbox" style="font-size: 32px; color: #94a3b8; display: block; margin-bottom: 8px;"></i>
+                            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 12px;">You have not applied for any placement drives yet.</p>
+                            <a href="/jobs" class="btn-quick" style="font-size: 12px; padding: 8px 16px;">Browse Active Drives →</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Right Column: Profile Completion, Interviews, Notifications & Placement Status -->
+            <div>
+                <!-- Placement Offer Card (if placed) -->
+                {% if placement %}
+                <div class="card" id="placementSection" style="background: linear-gradient(135deg, #059669 0%, #047857 100%); color: white;">
+                    <div class="card-title" style="color: white;"><i class="bi bi-trophy-fill"></i> Congratulations!</div>
+                    <p style="font-size: 14px; margin-top: 8px; opacity: 0.9;">
+                        You have been officially placed at <strong>{{ placement.companies.company_name if placement.companies else 'Company' }}</strong>!
+                    </p>
+                    <div style="margin-top: 12px; font-size: 16px; font-weight: 800;">
+                        Package: ₹{{ placement.package or 'N/A' }} LPA
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Profile Completion -->
+                <div class="completion-container">
+                    <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 700;">
+                        <span>Profile Completion</span>
+                        <span style="color: var(--primary);">{{ completion_pct }}%</span>
+                    </div>
+                    <div class="bar-bg">
+                        <div class="bar-fill" style="width: {{ completion_pct }}%;"></div>
+                    </div>
+                    <a href="/student/profile" style="font-size: 12px; color: var(--primary); font-weight: 600; display: inline-block; margin-top: 10px; text-decoration: none;">Complete your profile →</a>
+                </div>
+
+                <!-- Upcoming Interviews -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><i class="bi bi-calendar-check-fill" style="color: #2563eb;"></i> Upcoming Interviews</div>
+                    </div>
+
+                    {% if interviews %}
+                        {% for item in interviews %}
+                        <div class="interview-box">
+                            <div style="font-size: 14px; font-weight: 700; color: #92400e;">
+                                {{ item.applications.job_postings.job_title if item.applications and item.applications.job_postings else 'Interview Round' }}
+                            </div>
+                            <div style="font-size: 12px; color: #78350f; margin-top: 4px;">
+                                Date: {{ item.interview_date[:10] if item.interview_date else 'TBA' }} ({{ item.interview_time or '10:00 AM' }})
+                            </div>
+                            <div class="countdown-timer">
+                                <i class="bi bi-clock-history"></i> Round: {{ item.interview_round or 'Technical' }} • {{ item.interview_type or 'Online' }}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p style="font-size: 13px; color: var(--text-muted);">No interviews currently scheduled.</p>
+                    {% endif %}
+                </div>
+
+                <!-- Notifications -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><i class="bi bi-bell-fill" style="color: #059669;"></i> Recent Notifications</div>
+                        <a href="/notification/list" style="font-size: 12px; color: var(--primary); text-decoration: none; font-weight: 600;">View All</a>
+                    </div>
+
+                    {% if notifications %}
+                        {% for n in notifications %}
+                        <div style="padding: 10px 0; border-bottom: 1px solid #f1f5f9; font-size: 13px;">
+                            <div style="font-weight: 700; color: var(--bg-dark);">{{ n.title }}</div>
+                            <div style="color: var(--text-muted); font-size: 12px; margin-top: 2px;">{{ n.message }}</div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p style="font-size: 13px; color: var(--text-muted);">No new notifications.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function filterDrives(type, btn) {
+            document.querySelectorAll('.filter-pill').forEach(function(p) { p.classList.remove('active'); });
+            if (btn) btn.classList.add('active');
+            
+            var cards = document.querySelectorAll('.interactive-drive-card');
+            cards.forEach(function(card) {
+                if (type === 'all') {
+                    card.style.display = 'flex';
+                } else if (type === 'eligible') {
+                    card.style.display = (card.getAttribute('data-eligible') === 'true') ? 'flex' : 'none';
+                } else if (type === 'high-package') {
+                    var salary = parseFloat(card.getAttribute('data-salary') || 0);
+                    card.style.display = (salary >= 7.0) ? 'flex' : 'none';
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>

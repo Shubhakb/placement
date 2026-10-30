@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logged Out - PlacementPortal</title>
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --accent-emerald: #10b981;
+            --accent-purple: #8b5cf6;
+            --bg-dark: #0f172a;
+            --bg-body: #f8fafc;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; 
+            background: linear-gradient(135deg, #090e1a 0%, #0f172a 50%, #1e1b4b 100%);
+            color: #ffffff; 
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Ambient Animated Gradient Orbs */
+        .ambient-shape {
+            position: absolute;
+            pointer-events: none;
+            border-radius: 50%;
+            filter: blur(90px);
+            opacity: 0.35;
+            z-index: 1;
+            animation: floatOrb 9s ease-in-out infinite alternate;
+        }
+        .orb-1 {
+            width: 420px; height: 420px;
+            background: radial-gradient(circle, #38bdf8 0%, #2563eb 100%);
+            top: -100px; left: -80px;
+        }
+        .orb-2 {
+            width: 480px; height: 480px;
+            background: radial-gradient(circle, #10b981 0%, #059669 100%);
+            bottom: -100px; right: -80px;
+            animation-duration: 12s;
+            animation-direction: alternate-reverse;
+        }
+        @keyframes floatOrb {
+            0% { transform: translateY(0px) scale(1); }
+            100% { transform: translateY(-30px) scale(1.06); }
+        }
+
+        /* Top Minimal Header */
+        header { 
+            padding: 22px 48px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            position: relative;
+            z-index: 10;
+        }
+        .logo { 
+            font-size: 20px; 
+            font-weight: 800; 
+            color: #ffffff; 
+            text-decoration: none; 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+        }
+        .logo-shape {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #38bdf8 0%, #2563eb 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
+        }
+
+        .header-link {
+            color: #cbd5e1;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            backdrop-filter: blur(8px);
+            transition: all 0.2s;
+        }
+        .header-link:hover {
+            color: #38bdf8;
+            border-color: #38bdf8;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Main Center Card */
+        .logout-container {
+            position: relative;
+            z-index: 10;
+            max-width: 540px;
+            width: 90%;
+            margin: auto;
+            text-align: center;
+            padding: 45px 36px;
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 24px;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+            animation: cardAppear 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        @keyframes cardAppear {
+            from { opacity: 0; transform: translateY(20px) scale(0.96); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Glowing Status Icon */
+        .status-icon-shape {
+            width: 80px;
+            height: 80px;
+            border-radius: 24px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.3) 100%);
+            border: 2px solid #10b981;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 38px;
+            color: #34d399;
+            box-shadow: 0 0 35px rgba(16, 185, 129, 0.35);
+            margin-bottom: 24px;
+            animation: iconPulse 2s ease-in-out infinite;
+        }
+        @keyframes iconPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); box-shadow: 0 0 45px rgba(16, 185, 129, 0.5); }
+        }
+
+        .logout-title {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logout-desc {
+            font-size: 15px;
+            color: #94a3b8;
+            line-height: 1.6;
+            margin-bottom: 32px;
+        }
+
+        /* Action Buttons Grid */
+        .btn-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .btn-action-primary {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 15px;
+            box-shadow: 0 4px 18px rgba(37, 99, 235, 0.4);
+            transition: all 0.25s ease;
+        }
+        .btn-action-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.55);
+            background: linear-gradient(135deg, #1d4ed8 0%, #4338ca 100%);
+        }
+
+        .btn-action-secondary {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 13px 24px;
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 14px;
+            box-shadow: 0 4px 15px rgba(5, 150, 105, 0.35);
+            transition: all 0.25s ease;
+        }
+        .btn-action-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 22px rgba(5, 150, 105, 0.5);
+            background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+        }
+
+        .btn-action-ghost {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #cbd5e1;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            transition: all 0.2s;
+        }
+        .btn-action-ghost:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+            border-color: rgba(255, 255, 255, 0.25);
+        }
+
+        /* Footer */
+        footer {
+            padding: 24px;
+            text-align: center;
+            font-size: 13px;
+            color: #64748b;
+            position: relative;
+            z-index: 10;
+        }
+        footer a { color: #94a3b8; text-decoration: none; }
+        footer a:hover { color: #38bdf8; }
+    </style>
+</head>
+<body>
+
+    <!-- Ambient Glow Orbs -->
+    <div class="ambient-shape orb-1"></div>
+    <div class="ambient-shape orb-2"></div>
+
+    <header>
+        <a href="/" class="logo">
+            <div class="logo-shape">
+                <i class="bi bi-mortarboard-fill"></i>
+            </div>
+            <span>PlacementPortal</span>
+        </a>
+        <a href="/" class="header-link">
+            <i class="bi bi-house-door-fill"></i> Home Portal
+        </a>
+    </header>
+
+    <div class="logout-container">
+        <div class="status-icon-shape">
+            <i class="bi bi-shield-check"></i>
+        </div>
+        <h1 class="logout-title">Successfully Logged Out</h1>
+        <p class="logout-desc">
+            You have been safely signed out of your account session. Your data and credentials are secure. Choose below to log back in or explore the campus portal.
+        </p>
+
+        <div class="btn-stack">
+            <a href="/student/login" class="btn-action-primary">
+                <i class="bi bi-person-fill"></i> Student Portal Login &rarr;
+            </a>
+            <a href="/company/login" class="btn-action-secondary">
+                <i class="bi bi-briefcase-fill"></i> Recruiter Portal Login &rarr;
+            </a>
+            <a href="/" class="btn-action-ghost">
+                <i class="bi bi-arrow-left"></i> Return to Homepage
+            </a>
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2026 College Placement Management System &bull; Placement & Career Center
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Notification</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        form {
+            max-width: 600px;
+            margin: 20px auto;
+        }
+
+        label {
+            display: block;
+            margin-top: 12px;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            height: 120px;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Create Notification</h1>
+
+    <form method="POST">
+
+        <label>Student</label>
+
+        <select name="student_id" required>
+
+            <option value="">-- Select Student --</option>
+
+            {% for student in students %}
+
+            <option value="{{ student.id }}">
+                {{ student.full_name }} - {{ student.usn }}
+            </option>
+
+            {% endfor %}
+
+        </select>
+
+
+        <label>Title</label>
+
+        <input
+            type="text"
+            name="title"
+            placeholder="Enter notification title"
+            required
+        >
+
+
+        <label>Message</label>
+
+        <textarea
+            name="message"
+            placeholder="Enter notification message"
+            required
+        ></textarea>
+
+
+        <label>Read Status</label>
+
+        <select name="is_read">
+
+            <option value="false">Unread</option>
+            <option value="true">Read</option>
+
+        </select>
+
+
+        <button type="submit">
+            Create Notification
+        </button>
+
+    </form>
+
+    <div style="text-align:center;">
+        <a href="/notification/list">
+            ← Back to Notifications
+        </a>
+    </div>
+
+</body>
+</html>

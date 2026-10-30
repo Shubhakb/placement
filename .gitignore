@@ -1,0 +1,22 @@
+# Python Virtual Environment
+venv/
+env/
+ENV/
+
+# Secrets & Environment Variables
+.env
+*.env
+
+# Executable Binaries & Tools
+ngrok.exe
+*.exe
+
+# Python Cache & Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Uploads & Temporary Media
+uploads/
+*.log

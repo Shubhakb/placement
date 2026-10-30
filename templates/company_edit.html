@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Company - {{ company.company_name or 'Company' }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; margin: 0; background: #f1f5f9; color: #0f172a; }
+        header { background: #0f172a; color: white; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        header h1 { margin: 0; font-size: 20px; font-weight: 700; }
+        .nav-links a { color: #94a3b8; text-decoration: none; font-size: 14px; font-weight: 500; margin-left: 20px; }
+        .nav-links a:hover { color: white; }
+        .container { max-width: 900px; margin: 32px auto; padding: 0 24px; }
+        .profile-hero {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            color: white; padding: 28px 32px; border-radius: 16px;
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 28px; box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.2);
+        }
+        .hero-left { display: flex; align-items: center; gap: 20px; }
+        .avatar-circle {
+            width: 64px; height: 64px; border-radius: 16px;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px; font-weight: 700; color: white;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+        }
+        .form-card {
+            background: white; border-radius: 16px; padding: 32px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;
+        }
+        .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+        .full-width { grid-column: span 2; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        label { font-size: 13px; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; }
+        input, textarea {
+            padding: 12px 16px; border-radius: 8px; border: 1px solid #cbd5e1;
+            font-family: inherit; font-size: 14px; outline: none; transition: all 0.2s; background: #f8fafc;
+        }
+        input:focus, textarea:focus { border-color: #2563eb; background: white; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
+        textarea { resize: vertical; min-height: 100px; }
+        .form-actions { margin-top: 32px; padding-top: 24px; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+        .btn-cancel { color: #64748b; text-decoration: none; font-weight: 600; font-size: 14px; padding: 12px 24px; border-radius: 8px; }
+        .btn-cancel:hover { background: #e2e8f0; }
+        .btn-save {
+            background: #2563eb; color: white; border: none; padding: 12px 28px;
+            border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); transition: all 0.2s;
+        }
+        .btn-save:hover { background: #1d4ed8; transform: translateY(-1px); }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>🏢 Company Management - Admin</h1>
+    <div class="nav-links">
+        <a href="/company/list">← Back to Companies</a>
+        <a href="/admin/dashboard">Dashboard</a>
+    </div>
+</header>
+
+<div class="container">
+    <div class="profile-hero">
+        <div class="hero-left">
+            <div class="avatar-circle" id="previewAvatar">{{ company.company_name[0]|upper if company.company_name else 'C' }}</div>
+            <div>
+                <h2 style="margin: 0;" id="previewName">{{ company.company_name or 'Company Name' }}</h2>
+                <span style="color: #cbd5e1; font-size: 14px;" id="previewLocation">📍 {{ company.location or 'Location' }}</span>
+            </div>
+        </div>
+    </div>
+
+    <form method="POST" class="form-card">
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Company Name *</label>
+                <input type="text" name="company_name" id="inputName" value="{{ company.company_name or '' }}" required oninput="updatePreview()">
+            </div>
+
+            <div class="form-group">
+                <label>Email Address *</label>
+                <input type="email" name="email" value="{{ company.email or '' }}" required>
+            </div>
+
+            <div class="form-group">
+                <label>Contact Phone</label>
+                <input type="text" name="phone" value="{{ company.phone or '' }}" placeholder="+91 9876543210">
+            </div>
+
+            <div class="form-group">
+                <label>Website URL</label>
+                <input type="url" name="website" value="{{ company.website or '' }}" placeholder="https://company.com">
+            </div>
+
+            <div class="form-group full-width">
+                <label>HQ Location</label>
+                <input type="text" name="location" id="inputLocation" value="{{ company.location or '' }}" placeholder="Bangalore, India" oninput="updatePreview()">
+            </div>
+
+            <div class="form-group full-width">
+                <label>Company Overview & Description</label>
+                <textarea name="description" placeholder="Leading technology solution provider specializing in software development...">{{ company.description or '' }}</textarea>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <a href="/company/list" class="btn-cancel">Cancel</a>
+            <button type="submit" class="btn-save">💾 Save Company Updates</button>
+        </div>
+    </form>
+</div>
+
+<script>
+function updatePreview() {
+    const name = document.getElementById('inputName').value.trim() || 'Company Name';
+    const loc = document.getElementById('inputLocation').value.trim() || 'Location';
+    document.getElementById('previewName').innerText = name;
+    document.getElementById('previewAvatar').innerText = name.charAt(0).toUpperCase();
+    document.getElementById('previewLocation').innerText = '📍 ' + loc;
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Interview Schedule - Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; margin: 0; background: #f1f5f9; color: #0f172a; }
+        header { background: #0f172a; color: white; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        header h1 { margin: 0; font-size: 20px; font-weight: 700; }
+        .nav-links a { color: #94a3b8; text-decoration: none; font-size: 14px; font-weight: 500; margin-left: 20px; }
+        .nav-links a:hover { color: white; }
+        .container { max-width: 850px; margin: 32px auto; padding: 0 24px; }
+        .form-card {
+            background: white; border-radius: 16px; padding: 32px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;
+        }
+        .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+        .full-width { grid-column: span 2; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        label { font-size: 13px; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; }
+        input, select, textarea {
+            padding: 12px 16px; border-radius: 8px; border: 1px solid #cbd5e1;
+            font-family: inherit; font-size: 14px; outline: none; transition: all 0.2s; background: #f8fafc;
+        }
+        input:focus, select:focus, textarea:focus { border-color: #2563eb; background: white; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
+        textarea { resize: vertical; min-height: 90px; }
+        .form-actions { margin-top: 32px; padding-top: 24px; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+        .btn-cancel { color: #64748b; text-decoration: none; font-weight: 600; font-size: 14px; padding: 12px 24px; border-radius: 8px; }
+        .btn-cancel:hover { background: #e2e8f0; }
+        .btn-save {
+            background: #2563eb; color: white; border: none; padding: 12px 28px;
+            border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); transition: all 0.2s;
+        }
+        .btn-save:hover { background: #1d4ed8; transform: translateY(-1px); }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>📅 Interview Management - Admin</h1>
+    <div class="nav-links">
+        <a href="/interview/list">← Back to Interviews</a>
+        <a href="/admin/dashboard">Dashboard</a>
+    </div>
+</header>
+
+<div class="container">
+    <form method="POST" class="form-card">
+        <h2 style="margin-top: 0; margin-bottom: 24px; color: #0f172a; font-size: 20px;">Edit Interview Schedule & Result</h2>
+
+        <div class="form-grid">
+            <div class="form-group full-width">
+                <label>Select Application *</label>
+                <select name="application_id" required>
+                    <option value="">-- Select Application --</option>
+                    {% for item in applications %}
+                    <option value="{{ item.id }}" {% if item.id == interview.application_id %}selected{% endif %}>
+                        {{ item.students.full_name if item.students else 'Student' }} - {{ item.job_postings.job_title if item.job_postings else 'Job' }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Interview Date & Time *</label>
+                <input type="datetime-local" name="interview_date" value="{{ interview.interview_date or '' }}" required>
+            </div>
+
+            <div class="form-group">
+                <label>Interview Mode</label>
+                <select name="interview_type">
+                    <option value="Online" {% if interview.interview_type == 'Online' %}selected{% endif %}>Online (Google Meet / Zoom)</option>
+                    <option value="Offline" {% if interview.interview_type == 'Offline' %}selected{% endif %}>Offline (On-Campus)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Interviewer / Panel Name</label>
+                <input type="text" name="interviewer" value="{{ interview.interviewer or '' }}" placeholder="Technical Lead / HR Panel">
+            </div>
+
+            <div class="form-group">
+                <label>Round Evaluation Result</label>
+                <select name="result">
+                    <option value="Pending" {% if interview.result == 'Pending' %}selected{% endif %}>Pending</option>
+                    <option value="Selected" {% if interview.result == 'Selected' %}selected{% endif %}>Selected / Qualified</option>
+                    <option value="Rejected" {% if interview.result == 'Rejected' %}selected{% endif %}>Rejected</option>
+                </select>
+            </div>
+
+            <div class="form-group full-width">
+                <label>Feedback & Performance Remarks</label>
+                <textarea name="remarks" placeholder="Enter interviewer feedback, technical scores, or next round instructions...">{{ interview.remarks or '' }}</textarea>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <a href="/interview/list" class="btn-cancel">Cancel</a>
+            <button type="submit" class="btn-save">💾 Update Interview Details</button>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Manager - Student Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; margin: 0; background: #f8fafc; color: #1e293b; }
+        header { background: #0f172a; color: white; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; }
+        header h1 { margin: 0; font-size: 20px; font-weight: 700; }
+        .nav-links a { color: #94a3b8; text-decoration: none; font-size: 14px; margin-left: 20px; }
+        .nav-links a:hover { color: white; }
+
+        .container { max-width: 960px; margin: 32px auto; padding: 0 24px; }
+        .page-header { margin-bottom: 24px; }
+        .page-title { margin: 0; font-size: 26px; font-weight: 800; color: #0f172a; }
+
+        .card {
+            background: white; border-radius: 16px; padding: 32px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04); border: 1px solid #e2e8f0; margin-bottom: 28px;
+        }
+
+        .flash-messages { margin-bottom: 20px; }
+        .flash-msg { padding: 12px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+
+        .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; text-align: left; }
+        label { font-size: 13px; font-weight: 600; color: #475569; text-transform: uppercase; }
+        input[type="text"], input[type="file"] {
+            padding: 12px 16px; border-radius: 8px; border: 1px solid #cbd5e1; font-family: inherit; font-size: 14px; outline: none; background: white;
+        }
+
+        .btn-upload {
+            background: #2563eb; color: white; border: none; padding: 12px 28px; border-radius: 8px;
+            font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.2s;
+        }
+        .btn-upload:hover { background: #1d4ed8; }
+
+        .resume-list { display: flex; flex-direction: column; gap: 14px; }
+        .resume-item {
+            padding: 20px 24px; border-radius: 12px; background: white; border: 1px solid #e2e8f0;
+            display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            flex-wrap: wrap; gap: 16px;
+        }
+        .active-badge { background: #dcfce7; color: #15803d; padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 700; border: 1px solid #bbf7d0; }
+        .action-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+        
+        .btn-action {
+            padding: 8px 14px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 600; cursor: pointer; border: none;
+        }
+        .btn-preview { background: #eff6ff; color: #2563eb; }
+        .btn-preview:hover { background: #dbeafe; }
+        .btn-dl { background: #f0fdf4; color: #166534; }
+        .btn-dl:hover { background: #dcfce7; }
+        .btn-set { background: #fef3c7; color: #b45309; }
+        .btn-set:hover { background: #fde68a; }
+        .btn-del { background: #fef2f2; color: #dc2626; }
+        .btn-del:hover { background: #fee2e2; }
+
+        /* PDF Preview Modal */
+        .modal-backdrop {
+            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(4px);
+            display: none; align-items: center; justify-content: center; z-index: 9999; padding: 24px;
+        }
+        .modal-backdrop.show { display: flex; }
+        .modal-box {
+            background: white; width: 100%; max-width: 920px; height: 85vh; border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); display: flex; flex-direction: column; overflow: hidden;
+            animation: popIn 0.2s ease;
+        }
+        @keyframes popIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-header {
+            padding: 16px 24px; background: #0f172a; color: white; display: flex; justify-content: space-between; align-items: center;
+        }
+        .modal-body { flex: 1; background: #334155; position: relative; }
+        .modal-body object, .modal-body iframe { width: 100%; height: 100%; border: none; }
+        .modal-close { background: none; border: none; font-size: 20px; color: #94a3b8; cursor: pointer; }
+        .modal-close:hover { color: white; }
+
+        .fallback-box {
+            padding: 40px; text-align: center; color: white; background: #1e293b; height: 100%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>📄 Resume Manager Portal</h1>
+    <div class="nav-links">
+        <a href="/student/dashboard">← Dashboard</a>
+        <a href="/jobs">Browse Jobs</a>
+        <a href="/skill-gap-analysis">Skill Gap Analysis</a>
+    </div>
+</header>
+
+<div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="flash-msg">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <div class="page-header">
+        <h2 class="page-title">Resume Management & Document Viewer</h2>
+        <p style="margin: 4px 0 0; color: #64748b; font-size: 14px;">Upload multiple resume versions (PDF / DOCX), preview directly in browser, set active resume, or download files</p>
+    </div>
+
+    <!-- Upload Form Card -->
+    <form method="POST" enctype="multipart/form-data" class="card">
+        <h3 style="margin-top: 0; margin-bottom: 20px; font-size: 18px; color: #0f172a;">Upload New Resume File</h3>
+        
+        <div class="form-group">
+            <label>Resume Document Title</label>
+            <input type="text" name="resume_title" placeholder="e.g. Software_Developer_Resume_2026.pdf" required>
+        </div>
+
+        <div class="form-group">
+            <label>Select PDF / DOCX Document</label>
+            <input type="file" name="resume_file" accept=".pdf,.doc,.docx" required>
+        </div>
+
+        <button type="submit" class="btn-upload">📤 Upload Resume Document</button>
+    </form>
+
+    <!-- Resumes List -->
+    <div class="card">
+        <h3 style="margin-top: 0; margin-bottom: 20px; font-size: 18px; color: #0f172a;">Your Uploaded Resumes ({{ resumes|length }})</h3>
+        
+        <div class="resume-list">
+            {% for r in resumes %}
+            <div class="resume-item">
+                <div>
+                    <strong style="font-size: 15px; color: #0f172a;">{{ r.title }}</strong>
+                    <div style="font-size: 13px; color: #64748b; margin-top: 2px;">Filename: {{ r.filename }}</div>
+                </div>
+                
+                <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                    {% if r.is_active %}
+                        <span class="active-badge">✓ Active Profile Resume</span>
+                    {% else %}
+                        <a href="/set-active-resume/{{ r.filename }}" class="btn-action btn-set">Set Active</a>
+                    {% endif %}
+                    
+                    <div class="action-btns">
+                        <button type="button" class="btn-action btn-preview" onclick="openPdfPreview('{{ r.filename }}', '{{ r.title }}')">
+                            👁️ Interactive Preview
+                        </button>
+                        <a href="/download-resume/{{ r.filename }}" class="btn-action btn-dl">⬇️ Download</a>
+                        <a href="/delete-resume/{{ r.filename }}" class="btn-action btn-del" onclick="return confirm('Delete this resume file?')">🗑️ Delete</a>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div style="text-align: center; padding: 24px; color: #64748b;">No uploaded resumes found. Upload your first PDF resume above.</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- PDF Preview Modal -->
+<div id="previewModal" class="modal-backdrop">
+    <div class="modal-box">
+        <div class="modal-header">
+            <div style="font-weight: 700; font-size: 16px;" id="modalTitle">Resume Preview</div>
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <a id="modalExternalLink" href="#" target="_blank" style="color: #38bdf8; text-decoration: none; font-size: 13px; font-weight: 600;">↗️ Open in New Tab</a>
+                <button class="modal-close" onclick="closePdfPreview()">✕</button>
+            </div>
+        </div>
+        <div class="modal-body" id="modalBody">
+            <!-- Dynamic Object / Iframe rendering -->
+        </div>
+    </div>
+</div>
+
+<script>
+function openPdfPreview(filename, title) {
+    const previewUrl = '/preview-resume/' + encodeURIComponent(filename);
+    const downloadUrl = '/download-resume/' + encodeURIComponent(filename);
+
+    document.getElementById('modalTitle').innerText = '👁️ Preview: ' + title;
+    document.getElementById('modalExternalLink').href = previewUrl;
+
+    const modalBody = document.getElementById('modalBody');
+    modalBody.innerHTML = `
+        <object data="${previewUrl}" type="application/pdf" width="100%" height="100%">
+            <iframe src="${previewUrl}" width="100%" height="100%">
+                <div class="fallback-box">
+                    <div style="font-size: 20px; font-weight: 700;">📄 Document Viewer</div>
+                    <p>Browser PDF viewer plugin is disabled or loading inline file...</p>
+                    <div style="display: flex; gap: 12px; margin-top: 10px;">
+                        <a href="${previewUrl}" target="_blank" style="background: #2563eb; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600;">↗️ Open PDF in New Tab</a>
+                        <a href="${downloadUrl}" style="background: #059669; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600;">⬇️ Download PDF</a>
+                    </div>
+                </div>
+            </iframe>
+        </object>
+    `;
+
+    document.getElementById('previewModal').classList.add('show');
+}
+
+function closePdfPreview() {
+    document.getElementById('previewModal').classList.remove('show');
+    document.getElementById('modalBody').innerHTML = '';
+}
+</script>
+
+</body>
+</html>

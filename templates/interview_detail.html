@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Schedule & Live Countdown - CPMS</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; color: #1e293b; line-height: 1.6; }
+        header { background-color: #0f172a; color: #ffffff; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; color: #38bdf8; text-decoration: none; }
+        .nav-links { display: flex; gap: 20px; align-items: center; list-style: none; }
+        .nav-links a { color: #cbd5e1; text-decoration: none; font-size: 15px; font-weight: 500; }
+
+        .container { max-width: 900px; margin: 40px auto; padding: 0 20px; }
+        .back-link { display: inline-block; margin-bottom: 20px; color: #2563eb; text-decoration: none; font-weight: 600; }
+
+        .card { background: white; padding: 35px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; margin-bottom: 30px; }
+        .page-title { font-size: 24px; font-weight: 800; color: #0f172a; margin-bottom: 5px; }
+        .subtitle { color: #64748b; font-size: 15px; margin-bottom: 25px; }
+
+        /* Live Countdown Widget */
+        .countdown-box { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; border-radius: 12px; padding: 30px; text-align: center; margin-bottom: 35px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
+        .countdown-title { font-size: 14px; text-transform: uppercase; letter-spacing: 1.5px; color: #38bdf8; font-weight: 700; margin-bottom: 15px; }
+        
+        .timer-grid { display: flex; justify-content: center; gap: 20px; }
+        .time-block { background: rgba(255, 255, 255, 0.1); padding: 15px 20px; border-radius: 8px; min-width: 85px; backdrop-filter: blur(5px); border: 1px solid rgba(255, 255, 255, 0.15); }
+        .time-val { font-size: 36px; font-weight: 800; color: #ffffff; line-height: 1; }
+        .time-unit { font-size: 12px; text-transform: uppercase; color: #cbd5e1; margin-top: 6px; font-weight: 600; }
+
+        .details-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; background: #f8fafc; padding: 20px; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 30px; }
+        .detail-item label { display: block; font-size: 12px; color: #64748b; font-weight: 700; text-transform: uppercase; }
+        .detail-item span { font-size: 16px; font-weight: 700; color: #0f172a; }
+
+        .instructions-card { background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 10px; padding: 25px; }
+        .instructions-card h3 { color: #0369a1; font-size: 18px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .instructions-list { margin-left: 20px; color: #334155; font-size: 14px; }
+        .instructions-list li { margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="/" class="logo">🎓 College Placement Management System</a>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/interview/list">Interviews List</a></li>
+            <li><a href="/admin/dashboard">Admin Dashboard</a></li>
+        </ul>
+    </header>
+
+    <div class="container">
+        <a href="/interview/list" class="back-link">← Back to Interview Schedule</a>
+
+        <div class="card">
+            <h1 class="page-title">📅 Interview Drive Schedule & Details</h1>
+            <p class="subtitle">Official interview timetable and candidate instructions for campus recruitment.</p>
+
+            <!-- Live JavaScript Countdown Timer -->
+            <div class="countdown-box">
+                <div class="countdown-title">⏱️ Time Remaining Until Interview</div>
+                <div class="timer-grid" id="timerGrid">
+                    <div class="time-block">
+                        <div class="time-val" id="days">00</div>
+                        <div class="time-unit">Days</div>
+                    </div>
+                    <div class="time-block">
+                        <div class="time-val" id="hours">00</div>
+                        <div class="time-unit">Hours</div>
+                    </div>
+                    <div class="time-block">
+                        <div class="time-val" id="minutes">00</div>
+                        <div class="time-unit">Minutes</div>
+                    </div>
+                    <div class="time-block">
+                        <div class="time-val" id="seconds">00</div>
+                        <div class="time-unit">Seconds</div>
+                    </div>
+                </div>
+                <div id="expiredMsg" style="display:none; font-size: 20px; font-weight: 700; color: #38bdf8; margin-top: 10px;">
+                    🎯 Interview Drive session is in progress or completed.
+                </div>
+            </div>
+
+            <!-- Interview Metadata Breakdown -->
+            <div class="details-grid">
+                <div class="detail-item">
+                    <label>Candidate Name</label>
+                    <span>{{ interview.applications.students.full_name if interview.applications and interview.applications.students else 'Candidate' }}</span>
+                </div>
+                <div class="detail-item">
+                    <label>Company / Recruiter</label>
+                    <span>{{ interview.applications.job_postings.companies.company_name if interview.applications and interview.applications.job_postings and interview.applications.job_postings.companies else 'Recruiter' }}</span>
+                </div>
+                <div class="detail-item">
+                    <label>Job Title</label>
+                    <span>{{ interview.applications.job_postings.job_title if interview.applications and interview.applications.job_postings else 'Position' }}</span>
+                </div>
+                <div class="detail-item">
+                    <label>Interview Mode / Type</label>
+                    <span>{{ interview.interview_type or 'Technical Round' }}</span>
+                </div>
+                <div class="detail-item">
+                    <label>Assigned Interviewer</label>
+                    <span>{{ interview.interviewer or 'Placement Panel' }}</span>
+                </div>
+                <div class="detail-item">
+                    <label>Scheduled Date & Time</label>
+                    <span>{{ interview.interview_date[:16].replace('T', ' ') if interview.interview_date else 'TBA' }}</span>
+                </div>
+            </div>
+
+            <!-- Instructions Card -->
+            <div class="instructions-card">
+                <h3>📋 Important Candidate Guidelines & Round Instructions</h3>
+                <ul class="instructions-list">
+                    <li>Please report at least 15 minutes before the scheduled interview time.</li>
+                    <li>Keep 2 printed copies of your updated Resume and College Identity Card ready.</li>
+                    <li>Ensure a stable internet connection and quiet environment if participating in a virtual/online interview.</li>
+                    <li>Be prepared to discuss your BCA project work, technical skills, and core coursework topics.</li>
+                    <li>Maintain a formal business professional dress code.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live JS Countdown Script -->
+    <script>
+        const targetDateStr = "{{ interview.interview_date }}";
+        if (targetDateStr) {
+            const targetTime = new Date(targetDateStr).getTime();
+
+            function updateTimer() {
+                const now = new Date().getTime();
+                const diff = targetTime - now;
+
+                if (diff <= 0) {
+                    document.getElementById("timerGrid").style.display = "none";
+                    document.getElementById("expiredMsg").style.display = "block";
+                    return;
+                }
+
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+                document.getElementById("days").innerText = String(days).padStart(2, '0');
+                document.getElementById("hours").innerText = String(hours).padStart(2, '0');
+                document.getElementById("minutes").innerText = String(minutes).padStart(2, '0');
+                document.getElementById("seconds").innerText = String(seconds).padStart(2, '0');
+            }
+
+            updateTimer();
+            setInterval(updateTimer, 1000);
+        } else {
+            document.getElementById("timerGrid").style.display = "none";
+            document.getElementById("expiredMsg").innerText = "Date and Time to be announced.";
+            document.getElementById("expiredMsg").style.display = "block";
+        }
+    </script>
+
+</body>
+</html>

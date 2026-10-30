@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skill Gap Analysis & Course Recommendations</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; margin: 0; background: #f8fafc; color: #1e293b; }
+        header { background: #0f172a; color: white; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; }
+        header h1 { margin: 0; font-size: 20px; font-weight: 700; }
+        .nav-links a { color: #94a3b8; text-decoration: none; font-size: 14px; margin-left: 20px; }
+        .nav-links a:hover { color: white; }
+
+        .container { max-width: 1000px; margin: 32px auto; padding: 0 24px; }
+        .page-header { margin-bottom: 24px; }
+        .page-title { margin: 0; font-size: 26px; font-weight: 800; color: #0f172a; }
+
+        .card {
+            background: white; border-radius: 16px; padding: 32px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04); border: 1px solid #e2e8f0; margin-bottom: 28px;
+        }
+
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        label { font-size: 13px; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; }
+        select, input {
+            padding: 12px 16px; border-radius: 8px; border: 1px solid #cbd5e1;
+            font-family: inherit; font-size: 14px; outline: none; background: #f8fafc;
+        }
+        select:focus, input:focus { border-color: #2563eb; background: white; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
+
+        .analysis-hero {
+            padding: 28px 32px; border-radius: 16px; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: white; display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px;
+            flex-wrap: wrap; gap: 20px;
+        }
+        .score-circle {
+            width: 84px; height: 84px; border-radius: 50%;
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; font-weight: 800; color: white; border: 3px solid rgba(255,255,255,0.2);
+        }
+
+        .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+        @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+
+        .skills-box { padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0; }
+        .box-match { background: #f0fdf4; border-color: #bbf7d0; }
+        .box-missing { background: #fff7ed; border-color: #ffedd5; }
+
+        .chip-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+        .chip { padding: 6px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; }
+        .chip-green { background: #dcfce7; color: #15803d; }
+        .chip-red { background: #fee2e2; color: #b91c1c; }
+
+        .rec-item {
+            padding: 16px; border-radius: 12px; background: #f8fafc; border: 1px solid #e2e8f0;
+            margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .btn-learn {
+            background: #2563eb; color: white; padding: 8px 16px; border-radius: 8px;
+            text-decoration: none; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;
+        }
+        .btn-learn:hover { background: #1d4ed8; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>🎯 Skill Gap Analysis</h1>
+    <div class="nav-links">
+        <a href="/student/dashboard">Dashboard</a>
+        <a href="/calendar">Calendar</a>
+        <a href="/eligibility-checker">Eligibility Checker</a>
+    </div>
+</header>
+
+<div class="container">
+    <div class="page-header">
+        <h2 class="page-title">Skill Gap & Course Recommendation Engine</h2>
+        <p style="margin: 4px 0 0; color: #64748b; font-size: 14px;">Compare your candidate skills profile against target job drives to identify missing skills & recommended learning paths</p>
+    </div>
+
+    <!-- Job Selection Form -->
+    <form method="GET" action="/skill-gap-analysis" class="card">
+        <div class="form-group">
+            <label>Select Target Job Drive for Skill Comparison *</label>
+            <select name="job_id" onchange="this.form.submit()">
+                {% for job in jobs %}
+                <option value="{{ job.id }}" {% if selected_job and selected_job.id == job.id %}selected{% endif %}>
+                    {{ job.job_title }} - {{ job.companies.company_name if job.companies else 'Company' }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+    </form>
+
+    {% if analysis %}
+    <!-- Analysis Results -->
+    <div class="analysis-hero">
+        <div>
+            <h3 style="margin: 0; font-size: 22px;">
+                Skill Match Result: {{ analysis.match_pct }}%
+            </h3>
+            <p style="margin: 6px 0 0; font-size: 14px; opacity: 0.85;">
+                Target Position: <strong>{{ selected_job.job_title }}</strong> at {{ selected_job.companies.company_name if selected_job.companies else 'Company' }}
+            </p>
+        </div>
+        <div class="score-circle">
+            {{ analysis.match_pct }}%
+        </div>
+    </div>
+
+    <!-- Side-by-Side Skills Breakdown -->
+    <div class="grid-2" style="margin-bottom: 28px;">
+        <div class="skills-box box-match">
+            <h4 style="margin: 0; color: #166534; font-size: 16px;">✅ Matching Skills ({{ analysis.matching_skills|length }})</h4>
+            <div class="chip-container">
+                {% for s in analysis.matching_skills %}
+                    <span class="chip chip-green">✓ {{ s }}</span>
+                {% else %}
+                    <span style="font-size: 13px; color: #64748b;">No matching skills found.</span>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="skills-box box-missing">
+            <h4 style="margin: 0; color: #991b1b; font-size: 16px;">⚠️ Missing Skills to Bridge ({{ analysis.missing_skills|length }})</h4>
+            <div class="chip-container">
+                {% for s in analysis.missing_skills %}
+                    <span class="chip chip-red">✕ {{ s }}</span>
+                {% else %}
+                    <span style="font-size: 13px; color: #15803d; font-weight: 600;">Great job! You possess all required skills for this role.</span>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Course & Tutorial Recommendations -->
+    <div class="card">
+        <h3 style="margin-top: 0; margin-bottom: 20px; font-size: 18px; color: #0f172a;">💡 Recommended Learning Resources to Bridge Skill Gap</h3>
+        
+        <div>
+            {% for rec in analysis.recommendations %}
+            <div class="rec-item">
+                <div>
+                    <strong style="font-size: 15px; color: #0f172a;">{{ rec.skill }}</strong>
+                    <div style="font-size: 13px; color: #64748b; margin-top: 2px;">{{ rec.suggestion }}</div>
+                </div>
+                <a href="{{ rec.resource_link }}" target="_blank" class="btn-learn">
+                    📺 Start Free Course Tutorial
+                </a>
+            </div>
+            {% else %}
+            <div style="text-align: center; padding: 24px; color: #15803d; font-weight: 600;">
+                🎉 No skill gaps identified! You match 100% of the required skills for {{ selected_job.job_title }}.
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+</body>
+</html>

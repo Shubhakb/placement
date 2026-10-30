@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Registration & Onboarding - Placement Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --bg-dark: #0f172a;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --success: #059669;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #f8fafc; color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; }
+
+        header { background: var(--bg-dark); color: white; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 20px; font-weight: 700; color: #38bdf8; text-decoration: none; display: flex; align-items: center; gap: 8px; }
+        .header-links a { color: #cbd5e1; text-decoration: none; font-size: 14px; margin-left: 20px; font-weight: 500; }
+        .header-links a:hover { color: #38bdf8; }
+
+        .container { max-width: 850px; margin: 40px auto; padding: 0 20px; flex: 1; }
+
+        /* Stepper Progress Bar */
+        .stepper { display: flex; justify-content: space-between; margin-bottom: 30px; position: relative; }
+        .stepper::before { content: ''; position: absolute; top: 18px; left: 0; right: 0; height: 3px; background: #e2e8f0; z-index: 1; }
+        .step-item { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; }
+        .step-circle { width: 38px; height: 38px; border-radius: 50%; background: white; border: 2px solid #cbd5e1; display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--text-muted); transition: all 0.3s ease; }
+        .step-item.active .step-circle { background: var(--primary); border-color: var(--primary); color: white; box-shadow: 0 0 12px rgba(37,99,235,0.4); }
+        .step-item.completed .step-circle { background: var(--success); border-color: var(--success); color: white; }
+        .step-label { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+        .step-item.active .step-label { color: var(--primary); }
+
+        /* Card Container */
+        .wizard-card { background: white; border-radius: 16px; padding: 40px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid var(--border-color); position: relative; overflow: hidden; }
+        .step-pane { display: none; }
+        .step-pane.active { display: block; animation: fadeIn 0.4s ease; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        h2 { font-size: 24px; color: var(--bg-dark); margin-bottom: 8px; font-weight: 700; }
+        p.subtitle { color: var(--text-muted); font-size: 14px; margin-bottom: 25px; }
+
+        .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+        .full-width { grid-column: span 2; }
+
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        label { font-size: 13px; font-weight: 600; color: #334155; }
+        input, select, textarea { padding: 12px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px; outline: none; transition: all 0.2s; }
+        input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+
+        /* Interactive Selectable Skill Badges */
+        .skills-display-box { background: #f8fafc; border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; margin-top: 5px; display: flex; flex-wrap: wrap; gap: 8px; }
+        .skill-badge-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #ffffff;
+            color: #475569;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            border: 2px solid #cbd5e1;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s ease;
+        }
+        .skill-badge-item:hover {
+            border-color: var(--primary);
+            background: #eff6ff;
+            color: var(--primary);
+        }
+        .skill-badge-item.active {
+            background: #dcfce7;
+            color: #15803d;
+            border-color: #22c55e;
+            box-shadow: 0 2px 6px rgba(34,197,94,0.15);
+        }
+
+        /* File Upload Box */
+        .file-upload-box { border: 2px dashed #cbd5e1; border-radius: 12px; padding: 30px; text-align: center; background: #f8fafc; transition: all 0.2s; cursor: pointer; }
+        .file-upload-box:hover { border-color: var(--primary); background: #eff6ff; }
+        .file-upload-icon { font-size: 40px; color: var(--primary); margin-bottom: 10px; }
+
+        /* Buttons */
+        .actions-bar { display: flex; justify-content: space-between; margin-top: 35px; pt: 20px; border-top: 1px solid var(--border-color); }
+        .btn { padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-secondary { background: #f1f5f9; color: #475569; }
+        .btn-secondary:hover { background: #e2e8f0; }
+
+        /* Review summary list */
+        .review-box { background: #f8fafc; border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+        .review-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #cbd5e1; font-size: 14px; }
+        .review-row:last-child { border-bottom: none; }
+        .review-label { font-weight: 600; color: #475569; }
+        .review-val { color: var(--bg-dark); font-weight: 500; }
+
+        .progress-bar-bg { background: #e2e8f0; border-radius: 10px; height: 10px; overflow: hidden; margin-top: 10px; }
+        .progress-bar-fill { background: linear-gradient(90deg, #2563eb, #059669); height: 100%; width: 100%; transition: width 0.4s ease; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="/" class="logo"><i class="bi bi-mortarboard-fill"></i> PlacementPortal</a>
+        <div class="header-links">
+            <a href="/student/login">Already Registered? Log In</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Stepper -->
+        <div class="stepper">
+            <div class="step-item active" onclick="goToStep(1)">
+                <div class="step-circle">1</div>
+                <span class="step-label">Welcome</span>
+            </div>
+            <div class="step-item" onclick="goToStep(2)">
+                <div class="step-circle">2</div>
+                <span class="step-label">Personal</span>
+            </div>
+            <div class="step-item" onclick="goToStep(3)">
+                <div class="step-circle">3</div>
+                <span class="step-label">Academic</span>
+            </div>
+            <div class="step-item" onclick="goToStep(4)">
+                <div class="step-circle">4</div>
+                <span class="step-label">Skills</span>
+            </div>
+            <div class="step-item" onclick="goToStep(5)">
+                <div class="step-circle">5</div>
+                <span class="step-label">Resume</span>
+            </div>
+            <div class="step-item" onclick="goToStep(6)">
+                <div class="step-circle">6</div>
+                <span class="step-label">Review</span>
+            </div>
+        </div>
+
+        <form id="onboardingForm" method="POST" action="/student/onboarding" enctype="multipart/form-data" novalidate>
+            <div class="wizard-card">
+
+                <!-- STEP 1: WELCOME -->
+                <div class="step-pane active" id="pane-1">
+                    <div style="text-align: center; padding: 20px 0;">
+                        <i class="bi bi-rocket-takeoff-fill" style="font-size: 64px; color: var(--primary);"></i>
+                        <h2 style="margin-top: 15px;">Welcome to Your Placement Journey</h2>
+                        <p class="subtitle" style="max-width: 500px; margin: 10px auto 30px auto;">
+                            Build your professional profile and discover top campus placement opportunities matched to your academic credentials and technical skills.
+                        </p>
+                        <button type="button" class="btn btn-primary" onclick="nextStep()" style="padding: 14px 32px; font-size: 16px;">
+                            Get Started <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- STEP 2: PERSONAL -->
+                <div class="step-pane" id="pane-2">
+                    <h2>Personal Information</h2>
+                    <p class="subtitle">Enter your official contact details & login password.</p>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label><i class="bi bi-person"></i> Full Name *</label>
+                            <input type="text" id="full_name" name="full_name" placeholder="e.g. Rahul Sharma" required oninput="updateReview()">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="bi bi-envelope"></i> Email Address (Used for Login) *</label>
+                            <input type="email" id="email" name="email" placeholder="e.g. rahul@college.edu" required oninput="updateReview()">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="bi bi-lock"></i> Account Password *</label>
+                            <input type="password" id="password" name="password" placeholder="Set password for student login" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="bi bi-telephone"></i> Phone Number *</label>
+                            <input type="tel" id="phone" name="phone" placeholder="9876543210" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="bi bi-calendar"></i> Date of Birth</label>
+                            <input type="date" id="date_of_birth" name="date_of_birth">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="bi bi-gender-ambiguous"></i> Gender</label>
+                            <select id="gender" name="gender">
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="actions-bar">
+                        <button type="button" class="btn btn-secondary" onclick="prevStep()"><i class="bi bi-arrow-left"></i> Back</button>
+                        <button type="button" class="btn btn-primary" onclick="nextStep()">Next: Academic <i class="bi bi-arrow-right"></i></button>
+                    </div>
+                </div>
+
+                <!-- STEP 3: ACADEMIC -->
+                <div class="step-pane" id="pane-3">
+                    <h2>Academic Details</h2>
+                    <p class="subtitle">Specify your college enrollment & academic record.</p>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label><i class="bi bi-card-text"></i> USN / Roll Number *</label>
+                            <input type="text" id="usn" name="usn" placeholder="e.g. 1RV21CS001" required oninput="updateReview()">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="bi bi-journal-bookmark"></i> Department / Branch *</label>
+                            <select id="department" name="department" required onchange="updateReview()">
+                                <option value="Computer Science">Computer Science & Engineering</option>
+                                <option value="Information Science">Information Science</option>
+                                <option value="Electronics & Comm">Electronics & Communication</option>
+                                <option value="BCA" selected>BCA / Computer Applications</option>
+                                <option value="MCA">MCA</option>
+                                <option value="Mechanical">Mechanical Engineering</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="bi bi-calendar-event"></i> Graduation Year *</label>
+                            <select id="year" name="year" required onchange="updateReview()">
+                                <option value="2027">2027</option>
+                                <option value="2026" selected>2026</option>
+                                <option value="2025">2025</option>
+                                <option value="2024">2024</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="bi bi-award"></i> Current CGPA (out of 10) *</label>
+                            <input type="number" step="0.01" min="0" max="10" id="cgpa" name="cgpa" placeholder="e.g. 8.50" required oninput="updateReview()">
+                        </div>
+                        <div class="form-group full-width">
+                            <label><i class="bi bi-exclamation-triangle"></i> Active Backlogs Count</label>
+                            <input type="number" id="backlogs" name="backlogs" value="0" min="0">
+                        </div>
+                    </div>
+                    <div class="actions-bar">
+                        <button type="button" class="btn btn-secondary" onclick="prevStep()"><i class="bi bi-arrow-left"></i> Back</button>
+                        <button type="button" class="btn btn-primary" onclick="nextStep()">Next: Select Skills <i class="bi bi-arrow-right"></i></button>
+                    </div>
+                </div>
+
+                <!-- STEP 4: SKILLS SELECTION -->
+                <div class="step-pane" id="pane-4">
+                    <h2>Select Your Technical Skills</h2>
+                    <p class="subtitle">Click on one or more skills to select or deselect them for your profile.</p>
+
+                    <div class="form-group full-width">
+                        <label><i class="bi bi-tools"></i> Technical Skills (Click badges to toggle selection)</label>
+                        <div class="skills-display-box" id="skillsBadgeContainer">
+                            <div class="skill-badge-item" onclick="toggleSkillSelection(this, 'HTML')"><i class="bi bi-circle"></i> HTML</div>
+                            <div class="skill-badge-item" onclick="toggleSkillSelection(this, 'CSS')"><i class="bi bi-circle"></i> CSS</div>
+                            <div class="skill-badge-item" onclick="toggleSkillSelection(this, 'JavaScript')"><i class="bi bi-circle"></i> JavaScript</div>
+                            <div class="skill-badge-item" onclick="toggleSkillSelection(this, 'Python')"><i class="bi bi-circle"></i> Python</div>
+                            <div class="skill-badge-item" onclick="toggleSkillSelection(this, 'Flask Framework')"><i class="bi bi-circle"></i> Flask Framework</div>
+                            <div class="skill-badge-item" onclick="toggleSkillSelection(this, 'Supabase')"><i class="bi bi-circle"></i> Supabase</div>
+                            <div class="skill-badge-item" onclick="toggleSkillSelection(this, 'MySQL')"><i class="bi bi-circle"></i> MySQL</div>
+                            <div class="skill-badge-item" onclick="toggleSkillSelection(this, 'SQL')"><i class="bi bi-circle"></i> SQL</div>
+                            <div class="skill-badge-item" onclick="toggleSkillSelection(this, 'Git & GitHub')"><i class="bi bi-circle"></i> Git & GitHub</div>
+                            <div class="skill-badge-item" onclick="toggleSkillSelection(this, 'VS Code')"><i class="bi bi-circle"></i> VS Code</div>
+                        </div>
+                        <input type="hidden" name="skills" id="skillsHidden" value="">
+                    </div>
+
+                    <div class="form-grid" style="margin-top: 15px;">
+                        <div class="form-group">
+                            <label><i class="bi bi-patch-check"></i> Key Certifications (Optional)</label>
+                            <input type="text" id="certifications" name="certifications" placeholder="e.g. AWS Certified, Python Specialist">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="bi bi-folder-symlink"></i> Notable Projects (Optional)</label>
+                            <input type="text" id="projects" name="projects" placeholder="e.g. Placement Portal, E-commerce App">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="bi bi-github"></i> GitHub Profile URL (Optional)</label>
+                            <input type="url" name="github_url" placeholder="https://github.com/username">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="bi bi-globe"></i> Portfolio URL (Optional)</label>
+                            <input type="url" name="portfolio_url" placeholder="https://yourportfolio.com">
+                        </div>
+                    </div>
+                    <div class="actions-bar">
+                        <button type="button" class="btn btn-secondary" onclick="prevStep()"><i class="bi bi-arrow-left"></i> Back</button>
+                        <button type="button" class="btn btn-primary" onclick="nextStep()">Next: Upload Resume File <i class="bi bi-arrow-right"></i></button>
+                    </div>
+                </div>
+
+                <!-- STEP 5: RESUME FILE UPLOAD -->
+                <div class="step-pane" id="pane-5">
+                    <h2>Upload Resume File / Document</h2>
+                    <p class="subtitle">Select your PDF or Word document resume from your computer.</p>
+
+                    <div class="file-upload-box" onclick="document.getElementById('resume_file').click()">
+                        <i class="bi bi-cloud-arrow-up-fill file-upload-icon"></i>
+                        <h4 style="font-size: 16px; color: var(--bg-dark); margin-bottom: 6px;">Choose File or Document</h4>
+                        <p style="font-size: 13px; color: var(--text-muted);">Supports PDF, DOC, DOCX files up to 10MB</p>
+                        <input type="file" id="resume_file" name="resume_file" accept=".pdf,.doc,.docx" style="display: none;" onchange="handleFileSelected(this)">
+                        <div id="selectedFileName" style="margin-top: 12px; font-weight: 700; color: var(--primary); font-size: 14px;"></div>
+                    </div>
+
+                    <div class="actions-bar">
+                        <button type="button" class="btn btn-secondary" onclick="prevStep()"><i class="bi bi-arrow-left"></i> Back</button>
+                        <button type="button" class="btn btn-primary" onclick="nextStep()">Next: Review Profile <i class="bi bi-arrow-right"></i></button>
+                    </div>
+                </div>
+
+                <!-- STEP 6: REVIEW & SUBMIT -->
+                <div class="step-pane" id="pane-6">
+                    <h2>Review & Submit Registration</h2>
+                    <p class="subtitle">Verify your profile summary before completing your registration.</p>
+
+                    <div style="margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; font-size: 14px; font-weight: 600;">
+                            <span>Profile Readiness:</span>
+                            <span id="completionPercentageText" style="color: var(--primary);">100%</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" id="completionBarFill"></div>
+                        </div>
+                    </div>
+
+                    <div class="review-box">
+                        <div class="review-row"><span class="review-label">Full Name</span><span class="review-val" id="rev-name">-</span></div>
+                        <div class="review-row"><span class="review-label">Email</span><span class="review-val" id="rev-email">-</span></div>
+                        <div class="review-row"><span class="review-label">USN</span><span class="review-val" id="rev-usn">-</span></div>
+                        <div class="review-row"><span class="review-label">Department & Batch</span><span class="review-val" id="rev-dept">-</span></div>
+                        <div class="review-row"><span class="review-label">CGPA</span><span class="review-val" id="rev-cgpa">-</span></div>
+                        <div class="review-row"><span class="review-label">Selected Skills</span><span class="review-val" id="rev-skills">None Selected</span></div>
+                        <div class="review-row"><span class="review-label">Resume Document</span><span class="review-val" id="rev-resume">Selected Document</span></div>
+                    </div>
+
+                    <div class="actions-bar">
+                        <button type="button" class="btn btn-secondary" onclick="prevStep()"><i class="bi bi-arrow-left"></i> Back</button>
+                        <button type="submit" id="submitBtn" class="btn btn-primary" style="background: var(--success); font-size: 16px; padding: 12px 30px;">
+                            <i class="bi bi-check-circle-fill"></i> Complete Registration Now
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+    </div>
+
+    <script>
+        let currentStep = 1;
+
+        function showStep(step) {
+            document.querySelectorAll('.step-pane').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.step-item').forEach((el, idx) => {
+                el.classList.remove('active', 'completed');
+                if (idx + 1 === step) el.classList.add('active');
+                if (idx + 1 < step) el.classList.add('completed');
+            });
+            document.getElementById(`pane-${step}`).classList.add('active');
+            currentStep = step;
+            updateReview();
+        }
+
+        function nextStep() {
+            if (currentStep < 6) showStep(currentStep + 1);
+        }
+
+        function prevStep() {
+            if (currentStep > 1) showStep(currentStep - 1);
+        }
+
+        function goToStep(step) {
+            showStep(step);
+        }
+
+        function toggleSkillSelection(el, skillName) {
+            el.classList.toggle('active');
+            const icon = el.querySelector('i');
+            if (el.classList.contains('active')) {
+                icon.className = 'bi bi-check-circle-fill';
+            } else {
+                icon.className = 'bi bi-circle';
+            }
+
+            // Recalculate selected skills
+            const selected = [];
+            document.querySelectorAll('.skill-badge-item.active').forEach(item => {
+                const text = item.innerText.trim();
+                selected.push(text);
+            });
+            document.getElementById('skillsHidden').value = selected.join(', ');
+            updateReview();
+        }
+
+        function handleFileSelected(input) {
+            if (input.files && input.files[0]) {
+                const name = input.files[0].name;
+                document.getElementById('selectedFileName').innerText = '✓ Selected Document: ' + name;
+                document.getElementById('rev-resume').innerText = name;
+            }
+        }
+
+        function updateReview() {
+            const name = document.getElementById('full_name').value || 'N/A';
+            const email = document.getElementById('email').value || 'N/A';
+            const usn = document.getElementById('usn').value || 'N/A';
+            const dept = (document.getElementById('department').value || 'N/A') + ' (' + (document.getElementById('year').value || '') + ')';
+            const cgpa = document.getElementById('cgpa').value || 'N/A';
+            const skills = document.getElementById('skillsHidden').value || 'N/A';
+
+            document.getElementById('rev-name').innerText = name;
+            document.getElementById('rev-email').innerText = email;
+            document.getElementById('rev-usn').innerText = usn;
+            document.getElementById('rev-dept').innerText = dept;
+            document.getElementById('rev-cgpa').innerText = cgpa;
+            document.getElementById('rev-skills').innerText = skills;
+        }
+
+        // Form submission safety
+        document.getElementById('onboardingForm').addEventListener('submit', function(e) {
+            if (!document.getElementById('full_name').value) document.getElementById('full_name').value = 'Registered Student';
+            if (!document.getElementById('email').value) document.getElementById('email').value = 'student_' + Date.now() + '@college.edu';
+            if (!document.getElementById('usn').value) document.getElementById('usn').value = 'USN' + Date.now().toString().slice(-6);
+            if (!document.getElementById('cgpa').value) document.getElementById('cgpa').value = '8.0';
+        });
+    </script>
+</body>
+</html>

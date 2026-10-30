@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Applications - Interactive Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; margin: 0; background: #f8fafc; color: #1e293b; }
+        header { background: #0f172a; color: white; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        header h1 { margin: 0; font-size: 20px; font-weight: 700; }
+        .nav-links a { color: #94a3b8; text-decoration: none; font-size: 14px; font-weight: 500; margin-left: 20px; }
+        .nav-links a:hover { color: white; }
+        
+        .container { max-width: 1280px; margin: 32px auto; padding: 0 24px; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
+        .page-title { margin: 0; font-size: 24px; font-weight: 800; color: #0f172a; }
+        .btn-primary { background: #2563eb; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; box-shadow: 0 2px 6px rgba(37, 99, 235, 0.2); }
+        .btn-primary:hover { background: #1d4ed8; }
+
+        /* Toast Notification */
+        .toast-notify {
+            position: fixed; top: 24px; right: 24px; background: #0f172a; color: white;
+            padding: 14px 24px; border-radius: 12px; font-weight: 600; font-size: 14px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 10px;
+            transform: translateY(-100px); opacity: 0; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 9999;
+        }
+        .toast-notify.show { transform: translateY(0); opacity: 1; }
+
+        /* Interactive Filter Pills */
+        .filter-pills { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .pill-btn {
+            background: white; border: 1px solid #cbd5e1; color: #475569; padding: 8px 16px;
+            border-radius: 9999px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+        }
+        .pill-btn:hover { background: #f1f5f9; color: #0f172a; }
+        .pill-btn.active { background: #2563eb; color: white; border-color: #2563eb; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3); }
+
+        .toolbar { display: flex; gap: 16px; margin-bottom: 24px; align-items: center; }
+        .search-box { position: relative; flex: 1; max-width: 400px; }
+        .search-box input { width: 100%; padding: 10px 16px 10px 40px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 14px; outline: none; }
+        .search-box input:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
+        .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
+        .stat-badge { background: white; padding: 8px 16px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 13px; font-weight: 600; color: #475569; }
+
+        .table-card { background: white; border-radius: 12px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04); border: 1px solid #e2e8f0; overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { background: #f8fafc; padding: 14px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; color: #64748b; border-bottom: 1px solid #e2e8f0; }
+        td { padding: 16px 20px; font-size: 14px; color: #334155; border-bottom: 1px solid #f1f5f9; }
+        tr:hover td { background: #f8fafc; }
+
+        /* Interactive Select Dropdown in Table */
+        .status-select {
+            padding: 6px 12px; border-radius: 9999px; font-size: 12px; font-weight: 700;
+            border: 1px solid transparent; outline: none; cursor: pointer; transition: all 0.2s;
+        }
+        .sel-applied { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
+        .sel-shortlisted { background: #fef3c7; color: #b45309; border-color: #fde68a; }
+        .sel-selected { background: #dcfce7; color: #15803d; border-color: #bbf7d0; }
+        .sel-rejected { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
+
+        .action-btns { display: flex; gap: 8px; align-items: center; }
+        .btn-action { padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 600; }
+        .btn-edit { background: #eff6ff; color: #2563eb; }
+        .btn-edit:hover { background: #dbeafe; }
+        .btn-delete { background: #fef2f2; color: #dc2626; }
+        .btn-delete:hover { background: #fee2e2; }
+        .btn-timeline { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+        .btn-timeline:hover { background: #dcfce7; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>📝 Student Applications - Interactive Manager</h1>
+    <div class="nav-links">
+        <a href="/admin/dashboard">← Dashboard</a>
+        <a href="/eligibility-checker">⚡ Eligibility Checker</a>
+        <a href="/student/list">Students</a>
+        <a href="/job/list">Jobs</a>
+        <a href="/interview/list">Interviews</a>
+        <a href="/placement/list">Placements</a>
+    </div>
+</header>
+
+<div id="toast" class="toast-notify">
+    <span id="toastMsg">Application status updated successfully!</span>
+</div>
+
+<div class="container">
+    <div class="page-header">
+        <div>
+            <h2 class="page-title">Job Applications Manager</h2>
+            <p style="margin: 4px 0 0; color: #64748b; font-size: 14px;">Instant status updates, live candidate filtering, and shortlist tracking</p>
+        </div>
+        <a href="/application/register" class="btn-primary">+ Register Application</a>
+    </div>
+
+    <!-- Filter Pills -->
+    <div class="filter-pills">
+        <button type="button" class="pill-btn active" onclick="filterByStatus('all', this)">All Applications</button>
+        <button type="button" class="pill-btn" onclick="filterByStatus('applied', this)">Applied</button>
+        <button type="button" class="pill-btn" onclick="filterByStatus('shortlisted', this)">Shortlisted</button>
+        <button type="button" class="pill-btn" onclick="filterByStatus('selected', this)">Selected / Hired</button>
+        <button type="button" class="pill-btn" onclick="filterByStatus('rejected', this)">Rejected</button>
+    </div>
+
+    <div class="toolbar">
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="Search by student name, USN, job title, company..." onkeyup="filterTable()">
+        </div>
+        <div class="stat-badge">Showing: <strong id="appCount">{{ applications|length }}</strong> / {{ applications|length }} Applications</div>
+    </div>
+
+    <div class="table-card">
+        <table id="appTable">
+            <thead>
+                <tr>
+                    <th>Student Name</th>
+                    <th>USN</th>
+                    <th>Job Title</th>
+                    <th>Company</th>
+                    <th>Applied Date</th>
+                    <th>Live Status Update</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for app in applications %}
+                {% set st = (app.status or 'Applied')|lower %}
+                <tr data-status="{{ st }}">
+                    <td><strong>{{ app.students.full_name if app.students else 'N/A' }}</strong></td>
+                    <td><code>{{ app.students.usn if app.students else 'N/A' }}</code></td>
+                    <td>{{ app.job_postings.job_title if app.job_postings else 'N/A' }}</td>
+                    <td>{{ app.job_postings.companies.company_name if app.job_postings and app.job_postings.companies else 'N/A' }}</td>
+                    <td>📅 {{ app.applied_at or 'N/A' }}</td>
+                    <td>
+                        <!-- Interactive Instant Status Dropdown -->
+                        <select class="status-select {% if st == 'selected' %}sel-selected{% elif st == 'shortlisted' %}sel-shortlisted{% elif st == 'rejected' %}sel-rejected{% else %}sel-applied{% endif %}"
+                                onchange="updateApplicationStatus('{{ app.id }}', this)">
+                            <option value="Applied" {% if app.status == 'Applied' %}selected{% endif %}>Applied</option>
+                            <option value="Shortlisted" {% if app.status == 'Shortlisted' %}selected{% endif %}>Shortlisted</option>
+                            <option value="Selected" {% if app.status == 'Selected' %}selected{% endif %}>Selected (Hired)</option>
+                            <option value="Rejected" {% if app.status == 'Rejected' %}selected{% endif %}>Rejected</option>
+                        </select>
+                    </td>
+                    <td>
+                        <div class="action-btns">
+                            {% if app.students and app.students.resume_url %}
+                                {% set res_file = app.students.resume_url.split('/')[-1] %}
+                                <a href="/preview-resume/{{ res_file }}" target="_blank" class="btn-action" style="background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0;">📄 Candidate Resume</a>
+                            {% endif %}
+                            <a href="/application/timeline/{{ app.id }}" class="btn-action btn-timeline">📍 Timeline</a>
+                            <a href="/application/edit/{{ app.id }}" class="btn-action btn-edit">✏️ Edit</a>
+                            <a href="/application/delete/{{ app.id }}" class="btn-action btn-delete" onclick="return confirm('Are you sure you want to delete this application?')">🗑️ Delete</a>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" style="padding: 40px; text-align: center; color: #64748b;">No application records found. Click "+ Register Application" to submit one.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+let currentStatusFilter = 'all';
+
+function filterByStatus(status, btn) {
+    currentStatusFilter = status.toLowerCase();
+    document.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    filterTable();
+}
+
+function filterTable() {
+    const searchVal = document.getElementById('searchInput').value.toLowerCase();
+    const rows = document.querySelectorAll('#appTable tbody tr');
+    let visibleCount = 0;
+
+    rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        const rowStatus = row.getAttribute('data-status') || '';
+        const matchesSearch = text.includes(searchVal);
+        const matchesFilter = (currentStatusFilter === 'all') || (rowStatus === currentStatusFilter);
+
+        if (matchesSearch && matchesFilter) {
+            row.style.display = '';
+            visibleCount++;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+    document.getElementById('appCount').innerText = visibleCount;
+}
+
+// Instant AJAX Status Updater
+function updateApplicationStatus(appId, selectEl) {
+    const newStatus = selectEl.value;
+    const lowerStatus = newStatus.toLowerCase();
+
+    // Update element class dynamically
+    selectEl.className = 'status-select ';
+    if (lowerStatus === 'selected') selectEl.classList.add('sel-selected');
+    else if (lowerStatus === 'shortlisted') selectEl.classList.add('sel-shortlisted');
+    else if (lowerStatus === 'rejected') selectEl.classList.add('sel-rejected');
+    else selectEl.classList.add('sel-applied');
+
+    // Update tr data attribute
+    const tr = selectEl.closest('tr');
+    if (tr) tr.setAttribute('data-status', lowerStatus);
+
+    fetch('/api/update-application-status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ application_id: appId, status: newStatus })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            showToast('⚡ Status updated to "' + newStatus + '" in real-time!');
+        } else {
+            showToast('⚠️ Failed to update status.');
+        }
+    })
+    .catch(() => showToast('⚠️ Connection error.'));
+}
+
+function showToast(msg) {
+    const toast = document.getElementById('toast');
+    document.getElementById('toastMsg').innerText = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+}
+</script>
+
+</body>
+</html>
